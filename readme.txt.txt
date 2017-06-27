@@ -24,3 +24,10 @@ correctAnswer :
 date created :
 userAdded :
 lessonURL :
+
+TODO:
+    Add data models
+    Write data specific routes
+    Write bot client
+    Write web interface
+    Add session logic/payment processes
