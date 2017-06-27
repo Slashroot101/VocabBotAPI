@@ -12,3 +12,15 @@ and answers differently. So, we must find a way to make each type of question di
 the category of question on the client side, and then make a request to the server with the data from this point. This allows this application to become extremely scalable. If the bot
 cannot figure out the word, this is where learning comes in. It will make a random guess until it is right. Once it is right, it will save the question in the database, and it will
 theoretically never have problems with this question again.
+
+
+Data Storage :
+
+Everyone word/sentence must contain the following meta-deta:
+
+word/sentence/audiobuffer : String
+answer(s) : {}
+correctAnswer :
+date created :
+userAdded :
+lessonURL :

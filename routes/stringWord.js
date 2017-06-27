@@ -5,39 +5,16 @@ var jwt  = require('jsonwebtoken');
 var bodyParser = require('body-parser'); // for reading POSTed form data into `req.body`
 var cookie = require('cookie');
 var moment = require('moment');
-
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+var stringWord = require('../DataModels/stringWord');
+mongoose.createConnection(config.database);
+router.use(express.static(__dirname + '/public'));
+router.use(express.static('./public/home'));
+router.use(expressSession({secret:config.secret}));
+router.use(bodyParser());
+router.get('/', function(req,res,next){
+  res.send("Hello! The API is responding at localhost:3000!");
 });
 
-//easy login route to verify bot use
-router.post('/login', function(res, res, next){
-  User.findOne({
-       username: req.body.username
-     }, function(err, user) {
-       if (err) throw err;
-
-       if (!user) {
-         res.send({success: false, msg: 'Authentication failed. User not found.'});
-       } else {
-         // check if password matches
-         user.comparePassword(req.body.password, function (err, isMatch) {
-           if (isMatch && !err) {
-             // if user is found and password is right create a token
-             var token = jwt.sign(user, String(config.secret), {
-               expiresIn: 1440 // expires in 24 hours
-             });
-             // return the information including token as JSON
-             res.cookie('token', token, { maxAge: 900000, httpOnly: true });
-             res.redirect('/home');
-           } else {
-             res.send({success: false, msg: 'Authentication failed. Wrong password.'});
-           }
-         });
-       }
-     });
-});
 
 //route middlware to verify token
 router.use(function(req, res, next) {
@@ -72,5 +49,21 @@ router.use(function(req, res, next) {
   }
 });
 
+router.post('/stringword/create', function(req, res, next){
+    var newWord = new stringWord({
+        prompt : req.body.prompt,
+        choices : {
+            a1 : req.body.a1,
+            a2 : req.body.a2,
+            a3 : req.body.a3,
+            a4 : req.body.a4
+        },
+        correctAnswer : req.body.correctAnswer,
+        dateCreated : req.body.dateCreated,
+        addedBy : req.body.addedBy,
+        lessonURL : req.body.lessonURL
+    });
+    //TODO: search for documents to see if this object already exists, if it does, do not insert the document, if it doesn't, insert the document
+  stringWord.findOne(newWord, function())   
+});
 
-module.exports = router;
