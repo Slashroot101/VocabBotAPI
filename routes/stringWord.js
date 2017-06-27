@@ -5,11 +5,12 @@ var jwt  = require('jsonwebtoken');
 var bodyParser = require('body-parser'); // for reading POSTed form data into `req.body`
 var cookie = require('cookie');
 var moment = require('moment');
+var config = require('../config.js');
 var stringWord = require('../DataModels/stringWord');
+console.log(config.database);
 mongoose.createConnection(config.database);
 router.use(express.static(__dirname + '/public'));
 router.use(express.static('./public/home'));
-router.use(expressSession({secret:config.secret}));
 router.use(bodyParser());
 router.get('/', function(req,res,next){
   res.send("Hello! The API is responding at localhost:3000!");
@@ -49,7 +50,7 @@ router.use(function(req, res, next) {
   }
 });
 
-router.post('/stringword/create', function(req, res, next){
+router.post('/create', function(req, res, next){
     var newWord = new stringWord({
         prompt : req.body.prompt,
         choices : {
@@ -63,7 +64,24 @@ router.post('/stringword/create', function(req, res, next){
         addedBy : req.body.addedBy,
         lessonURL : req.body.lessonURL
     });
-    //TODO: search for documents to see if this object already exists, if it does, do not insert the document, if it doesn't, insert the document
-  stringWord.findOne(newWord, function())   
+  stringWord.findOne(newWord, function(err, data){
+    if(err){
+        throw err;
+    } else {
+        if(data.length == 0){
+            newWord.save(function(err){
+                if(err){
+                    throw err;
+                } else {
+                    console.log('Word successfully saved');
+                }
+            });
+        } else {
+            console.log('Word already found in database!');
+            res.end();
+        }
+    }
+  });   
 });
 
+module.exports = router;
