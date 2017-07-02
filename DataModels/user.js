@@ -6,8 +6,6 @@ var UserSchema = new Schema({
   password: String,
   phonenumber: String,
   email: String,
-  apikey: String,
-  animal: String,
   admin: Boolean()
 });
 

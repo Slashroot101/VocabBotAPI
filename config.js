@@ -1,4 +1,5 @@
 module.exports =
 {
-    database : 'mongodb://localhost:27017/VocabBot'
+    database : 'mongodb://localhost:27017/VocabBot',
+    secret : 'test'
 };

@@ -5,16 +5,32 @@ var jwt  = require('jsonwebtoken');
 var bodyParser = require('body-parser'); // for reading POSTed form data into `req.body`
 var cookie = require('cookie');
 var moment = require('moment');
-
+var User = require('../DataModels/user');
+var config = require('../config');
+mongoose.connect(config.database);
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
-
+router.get('/signup', function(req, res, next){
+  console.log('Registering user!');
+  //TODO: make an actual signup route
+  var newUser = new User({
+    name: 'sam41075',
+    password: 'test',
+    phonenumber: '5132992209',
+    email: 'test@test.com',
+    admin: true
+  });
+  newUser.save(function(err){
+    res.send('Saved successfully!');
+    console.log('User saved successfully!');
+  });
+});
 //easy login route to verify bot use
-router.post('/login', function(res, res, next){
+router.post('/login', function(req, res, next){
   User.findOne({
-       username: req.body.username
+       name: req.body.username
      }, function(err, user) {
        if (err) throw err;
 
@@ -30,7 +46,7 @@ router.post('/login', function(res, res, next){
              });
              // return the information including token as JSON
              res.cookie('token', token, { maxAge: 900000, httpOnly: true });
-             res.redirect('/home');
+             res.send(token);
            } else {
              res.send({success: false, msg: 'Authentication failed. Wrong password.'});
            }

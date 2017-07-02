@@ -5,9 +5,8 @@ var jwt  = require('jsonwebtoken');
 var bodyParser = require('body-parser'); // for reading POSTed form data into `req.body`
 var cookie = require('cookie');
 var moment = require('moment');
-var config = require('../config.js');
+var config = require('../config');
 var stringWord = require('../DataModels/stringWord');
-console.log(config.database);
 mongoose.createConnection(config.database);
 router.use(express.static(__dirname + '/public'));
 router.use(express.static('./public/home'));
@@ -16,6 +15,7 @@ router.get('/', function(req,res,next){
   res.send("Hello! The API is responding at localhost:3000!");
 });
 
+router.get
 
 //route middlware to verify token
 router.use(function(req, res, next) {
