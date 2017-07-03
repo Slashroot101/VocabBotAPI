@@ -20,7 +20,8 @@ router.get('/signup', function(req, res, next){
     password: 'test',
     phonenumber: '5132992209',
     email: 'test@test.com',
-    admin: true
+    admin: true,
+    addedPoints : 0
   });
   newUser.save(function(err){
     res.send('Saved successfully!');
@@ -41,7 +42,7 @@ router.post('/login', function(req, res, next){
          user.comparePassword(req.body.password, function (err, isMatch) {
            if (isMatch && !err) {
              // if user is found and password is right create a token
-             var token = jwt.sign(user, String(config.secret), {
+             var token = jwt.sign({name : req.body.username, isAdmin : req.body.isAdmin}, String(config.secret), {
                expiresIn: 1440 // expires in 24 hours
              });
              // return the information including token as JSON

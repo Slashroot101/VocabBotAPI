@@ -6,7 +6,8 @@ var UserSchema = new Schema({
   password: String,
   phonenumber: String,
   email: String,
-  admin: Boolean()
+  admin: Boolean(),
+  addedPoints : Number()
 });
 
 //TODO: CHANGE THE COST FACTOR OF THIS ENCRYPTION
