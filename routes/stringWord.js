@@ -46,7 +46,7 @@ router.use(function(req, res, next) {
         message: 'No token provided.'
     });
     */
-    res.json({error : 'Token not provided or a bad token was provided. Please login and retry.'});
+    res.json({success : false, error : 'Token not provided or a bad token was provided. Please login and retry.'});
   }
 });
 
@@ -55,32 +55,28 @@ router.post('/create', function(req, res, next){
     var newWord = new stringWord({
         prompt : req.body.prompt,
         choices : {
-            a1 : req.body.a1,
-            a2 : req.body.a2,
-            a3 : req.body.a3,
-            a4 : req.body.a4
+            a1 : req.body.choices.a1,
+            a2 : req.body.choices.a2,
+            a3 : req.body.choices.a3,
+            a4 : req.body.choices.a4
         },
         correctAnswer : req.body.correctAnswer,
-        dateCreated : req.body.dateCreated,
+        dateCreated : moment(),
         addedBy : req.body.addedBy,
         lessonURL : req.body.lessonURL
     });
-    console.log(req.body);
     console.log('Looking for possible duplicates of the word.');
+    var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
     stringWord.findOne(
         //structured query to find if there is a entry of this already in the DB. prompt and answers are the only thing that matters
-        
                 {
                     prompt : { $eq : req.body.prompt},
-                    a1 : req.body.a1,
-                    a2 : req.body.a2,
-                    a3 : req.body.a3,
-                    a4 : req.body.a4,
-                    correctAnswer : req.body.correctAnswer
-
+                    "choices.a1" : req.body.choices.a1,
+                    "choices.a2" : req.body.choices.a2,
+                    "choices.a3" : req.body.choices.a3,
+                    "choices.a4" : req.body.choices.a4
                 } , function(err, data){
                     if(err) throw err;
-                    console.log(data);
                     if(!data){
                         console.log('Saving data! No duplicates found!');
                         newWord.save(function(err){
@@ -93,12 +89,34 @@ router.post('/create', function(req, res, next){
                             User.updateOne({name : decoded.name},{$inc : {addedPoints : 1}}, function(err, data){
                                 if(err) throw err;
                                 console.log("Adding points to the user's profile");
+                                res.send({status : 'Success!'});
                             });
                         });
                     } else {
-                        console.log('Duplicate was found.')
+                        console.log('Duplicate was found.');
+                        res.send({status : false, message : 'Data was already entered'});
                     }
                 });
             });
+//simple route to find the answer to a question, and if it cannot be found, tells the client to learn the word and send it to the DB to learn
+router.get('/find', function(req, res, next){
+    stringWord.findOne(
+                {
+                    prompt : req.query.prompt,
+                    "choices.a1" : req.query.a1,
+                    "choices.a2" : req.query.a2,
+                    "choices.a3" : req.query.a3,
+                    "choices.a4" : req.query.a4
+                    //in this case, we cannot query for correct answer, because they will not have that data available when answering the question
+                }, function(err, data){
+                    if(err) throw err;
+                    if(data) {
+                        res.send({answer : data.correctAnswer});
+                    } else {
+                        res.send({error : 'SW1'})
+                    }
+                }
+            );
+        });
 
 module.exports = router;
