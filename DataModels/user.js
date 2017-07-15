@@ -4,10 +4,16 @@ var Schema = mongoose.Schema;
 var UserSchema = new Schema({
   name: String,
   password: String,
-  phonenumber: String,
   email: String,
   admin: Boolean(),
-  addedPoints : Number()
+  role : String,
+  //from teaching the bot questions/answers. Used for discounts on purchasing more
+  addedPoints : Number(),
+  availablePoints: Number(),
+  totalUsedPoints: Number(),
+  numQuestionsAnswered: Number(),
+  lastUse: Date(),
+  dateJoined: Date()
 });
 
 //TODO: CHANGE THE COST FACTOR OF THIS ENCRYPTION
