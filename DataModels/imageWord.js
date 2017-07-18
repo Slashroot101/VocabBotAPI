@@ -3,22 +3,20 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 // create a schema
-var userSchema = new Schema({
-  name: String,
-  username: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  admin: Boolean,
-  location: String,
-  meta: {
-    age: Number,
-    website: String
+// all of the strings in here are the path of the images on the server
+var imageWord = new Schema({
+  prompt: String,
+  choices: {
+    a1: String,
+    a2: String,
+    a3: String,
+    a4: String
   },
-  created_at: Date,
-  updated_at: Date
+  correctAnswer: String,
+  dateCreated: Date,
+  addedBy: String,
+  lessonURL: String
 });
 
-// the schema is useless so far
-// we need to create a model using it
-var User = mongoose.model('User', userSchema);
 
-// make this available to our users in our Node applications
+var User = mongoose.model('Image', imageWord);

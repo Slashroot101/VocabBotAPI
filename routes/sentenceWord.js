@@ -84,7 +84,7 @@ router.post('/create', function (req, res, next) {
   }
 });
 
-router.get(`/find`, function(req, res){
+router.get(`/find`, function (req, res) {
   sentenceWord.findOne(
     {
       prompt: req.query.prompt,
@@ -92,12 +92,17 @@ router.get(`/find`, function(req, res){
       "choices.a2": req.query.a2,
       "choices.a3": req.query.a3,
       "choices.a4": req.query.a4
-    }, function(err, data){
-      if(err) throw err;
-      if(data){
-        res.JSON({ answer: data.correctAnswer});
+    }, function (err, data) {
+      if (err) throw err;
+      if (data) {
+        var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
+        User.updateOne({ name: decoded.name }, { $inc: { availablePoints: config.weights.sentenceWordWeight * -1 } }, function (err, data) {
+          if (err) throw err;
+          console.log("Adding points to the user's profile");
+          res.JSON({ answer: data.correctAnswer });
+        });
       } else {
-        res.JSON({ error: 'SEW1'});
+        res.JSON({ error: 'SEW1' });
       }
     }
   )

@@ -16,6 +16,42 @@ router.get('/', function (req, res, next) {
     res.send("Hello! The API is responding at localhost:3000!");
 });
 
+//route middlware to verify token
+router.use(function (req, res, next) {
+  let cookies = cookie.parse(req.headers.cookie || '');
+  // check header or url parameters or post parameters for token
+  var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
+
+  // decode token
+  if (token) {
+
+    // verifies secret and checks exp
+    jwt.verify(token, config.secret, function (err, decoded) {
+      if (err) {
+        return res.json({ success: false, message: 'Failed to authenticate token.' });
+      } else {
+        // if everything is good, save to request for use in other routes
+        req.decoded = decoded;
+        next();
+      }
+    });
+
+  } else {
+
+    // if there is no token
+    // return an error
+    /*return res.status(403).send({
+        success: false,
+        message: 'No token provided.'
+    });
+    */
+    res.json({ success: false, error: 'Token not provided or a bad token was provided. Please login and retry.' });
+  }
+});
+
+router.use(function(req, res, next){
+
+});
 
 //saves a stringWord if one doesn't already exist matching it, if it does, it skips saving it, and does not reward any points
 router.post('/create', function (req, res, next) {
@@ -77,7 +113,12 @@ router.get('/find', function (req, res, next) {
         }, function (err, data) {
             if (err) throw err;
             if (data) {
-                res.JSON({ answer: data.correctAnswer });
+                var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
+                User.updateOne({ name: decoded.name }, { $inc: { availablePoints: config.weights.stringWordWeight * -1 } }, function (err, data) {
+                    if (err) throw err;
+                    console.log("Adding points to the user's profile");
+                    res.JSON({ answer: data.correctAnswer });
+                });
             } else {
                 res.JSON({ error: 'SW1' })
             }
