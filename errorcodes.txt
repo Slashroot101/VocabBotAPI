@@ -4,3 +4,7 @@ StringWord Errors
 
 SentenceWord Errors
     SEW1 : data could not be found -- has not been entered yet or there is some kind of error in finding the data
+
+
+ImageWord Errors
+    IW1 : data could not be found -- has not been entered yet or there is some kind of error in finding the data

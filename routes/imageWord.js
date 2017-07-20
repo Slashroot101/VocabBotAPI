@@ -44,18 +44,50 @@ router.use(function (req, res, next) {
 });
 
 
-router.create(function(req, res){
+router.post(`/create`,function(req, res){
     var newWord = new stringWord({
         prompt: req.body.prompt,
         choices: {
-            a1: String,
-            a2: String,
-            a3: String,
-            a4: String
+            a1: req.body.a1,
+            a2: req.body.a2,
+            a3: req.body.a3,
+            a4: req.body.a4
         },
         correctAnswer: req.body.correctAnswer,
         dateCreated: req.body.dateCreated,
         addedBy: req.body.addedBy,
         lessonURL: req.body.lessonURL
     });
+
+    newWord.save(function(err, data){
+      if(err) throw err;
+      if(data) {
+        var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
+        User.updateOne({ name: decoded.name }, { $inc: { availablePoints: config.weights.imageWordWeight * -1 } }, function (err, data) {
+          res.JSON({ answer: data.correctAnswer });
+        });
+      } else {
+        res.JSON({error: `IW1`})
+      }
+    });
+});
+
+router.get(`/find`, function(req, res){
+  imageWord.fineOne(
+    {
+      prompt: req.query.prompt,
+      "choices.a1": req.query.a1,
+      "choices.a2": req.query.a2,
+      "choices.a3": req.query.a3,
+      "choices.a4": req.query.a4,
+    }, function(err, data){
+      if(err) throw err;
+      if(data) {
+        var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
+        User.updateOne({ name: decoded.name }, { $inc: { availablePoints: config.weights.imageWordWeight * -1 } }, function (err, data) {
+          res.JSON({ answer: data.correctAnswer });
+        });
+      }
+    }
+  )
 });

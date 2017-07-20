@@ -12,8 +12,8 @@ var UserSchema = new Schema({
   availablePoints: Number(),
   totalUsedPoints: Number(),
   numQuestionsAnswered: Number(),
-  lastUse: Date(),
-  dateJoined: Date()
+  lastUse: Date,
+  dateJoined: Date
 });
 
 //TODO: CHANGE THE COST FACTOR OF THIS ENCRYPTION

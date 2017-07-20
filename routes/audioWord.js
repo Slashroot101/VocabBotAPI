@@ -8,10 +8,17 @@ var moment = require('moment');
 var config = require('../config');
 var audioWord = require('../DataModels/audioWord');
 var User = require('../DataModels/user');
-mongoose.connect(config.database);
 router.use(express.static(__dirname + '/public'));
 router.use(express.static('./public/home'));
 router.use(bodyParser());
+
+
+try {
+    mongoose.connect(config.database);
+} catch (err){
+    res.status(500).json(err);
+}
+
 router.get('/', function (req, res, next) {
     res.send("Hello! The API is responding at localhost:3000!");
 });
@@ -65,7 +72,7 @@ router.get('/find', function (req, res, next) {
                     res.JSON({ answer: data.correctAnswer });
                 });
             } else {
-                res.JSON({ error: 'SW1' })
+                res.JSON({ error: 'AW1' })
             }
         }
     );

@@ -93,12 +93,13 @@ router.get(`/find`, function (req, res) {
       "choices.a3": req.query.a3,
       "choices.a4": req.query.a4
     }, function (err, data) {
-      if (err) throw err;
+      if (err){
+        throw err;
+        res.status(500).json({err});
+      }
       if (data) {
         var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
         User.updateOne({ name: decoded.name }, { $inc: { availablePoints: config.weights.sentenceWordWeight * -1 } }, function (err, data) {
-          if (err) throw err;
-          console.log("Adding points to the user's profile");
           res.JSON({ answer: data.correctAnswer });
         });
       } else {
