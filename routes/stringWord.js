@@ -16,52 +16,90 @@ router.get('/', function (req, res, next) {
     res.send("Hello! The API is responding at localhost:3000!");
 });
 
+
 //route middlware to verify token
 router.use(function (req, res, next) {
-  let cookies = cookie.parse(req.headers.cookie || '');
-  // check header or url parameters or post parameters for token
-  var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
+    let cookies = cookie.parse(req.headers.cookie || '');
+    // check header or url parameters or post parameters for token
+    var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
 
-  // decode token
-  if (token) {
+    // decode token
+    if (token) {
 
-    // verifies secret and checks exp
-    jwt.verify(token, config.secret, function (err, decoded) {
-      if (err) {
-        return res.json({ success: false, message: 'Failed to authenticate token.' });
-      } else {
-        // if everything is good, save to request for use in other routes
-        req.decoded = decoded;
-        next();
-      }
-    });
+        // verifies secret and checks exp
+        jwt.verify(token, config.secret, function (err, decoded) {
+            if (err) {
+                console.log(req.query.token);
+                return res.json({ success: false, message: 'Failed to authenticate token.' });
+            } else {
+                // if everything is good, save to request for use in other routes
+                req.decoded = decoded;
+                next();
+            }
+        });
 
-  } else {
+    } else {
 
-    // if there is no token
-    // return an error
-    /*return res.status(403).send({
-        success: false,
-        message: 'No token provided.'
-    });
-    */
-    res.json({ success: false, error: 'Token not provided or a bad token was provided. Please login and retry.' });
-  }
+        // if there is no token
+        // return an error
+        /*return res.status(403).send({
+            success: false,
+            message: 'No token provided.'
+        });
+        */
+        res.json({ success: false, error: 'Token not provided or a bad token was provided. Please login and retry.' });
+    }
 });
 
-router.use(function(req, res, next){
-
-});
 
 //saves a stringWord if one doesn't already exist matching it, if it does, it skips saving it, and does not reward any points
 router.post('/create', function (req, res, next) {
-    var newWord = new stringWord({
+    var newWord1 = new stringWord({
         prompt: req.body.prompt,
         choices: {
             a1: req.body.choices.a1,
             a2: req.body.choices.a2,
             a3: req.body.choices.a3,
             a4: req.body.choices.a4
+        },
+        correctAnswer: req.body.correctAnswer,
+        dateCreated: moment(),
+        addedBy: req.body.addedBy,
+        lessonURL: req.body.lessonURL
+    });
+    var newWord2 = new stringWord({
+        prompt: req.body.prompt,
+        choices: {
+            a1: req.body.choices.a4,
+            a2: req.body.choices.a1,
+            a3: req.body.choices.a2,
+            a4: req.body.choices.a3
+        },
+        correctAnswer: req.body.correctAnswer,
+        dateCreated: moment(),
+        addedBy: req.body.addedBy,
+        lessonURL: req.body.lessonURL
+    });
+    var newWord3 = new stringWord({
+        prompt: req.body.prompt,
+        choices: {
+            a1: req.body.choices.a2,
+            a2: req.body.choices.a3,
+            a3: req.body.choices.a4,
+            a4: req.body.choices.a1
+        },
+        correctAnswer: req.body.correctAnswer,
+        dateCreated: moment(),
+        addedBy: req.body.addedBy,
+        lessonURL: req.body.lessonURL
+    });
+    var newWord4 = new stringWord({
+        prompt: req.body.prompt,
+        choices: {
+            a1: req.body.choices.a3,
+            a2: req.body.choices.a4,
+            a3: req.body.choices.a1,
+            a4: req.body.choices.a2
         },
         correctAnswer: req.body.correctAnswer,
         dateCreated: moment(),
@@ -82,18 +120,25 @@ router.post('/create', function (req, res, next) {
         }, function (err, data) {
             if (err) throw err;
             if (!data) {
-                console.log('Saving data! No duplicates found!');
-                newWord.save(function (err) {
+                newWord1.save(function (err) {
                     if (err) throw err;
-                    console.log('Data successfuly saved!');
+                    newWord2.save(function (errNewWord2) {
+                        if (errNewWord2) throw errNewWord2;
+                        newWord3.save(function (errNewWord3) {
+                            if (errNewWord3) throw errNewWord3;
+                            newWord4.save(function (errNewWord4) {
+                                if (errNewWord4) throw errNewWord4;
+                            });
+                        });
+                    });
                     var decoded = jwt.decode(token);
                     console.log(decoded.name);
                     User.updateOne({ name: decoded.name }, { $inc: { addedPoints: 1 } }, function (err, data) {
                         if (err) throw err;
-                        console.log("Adding points to the user's profile");
                         res.JSON({ status: 'Success!' });
                     });
                 });
+
             } else {
                 console.log('Duplicate was found.');
                 res.JSON({ status: false, message: 'Data was already entered' });
@@ -102,6 +147,7 @@ router.post('/create', function (req, res, next) {
 });
 //simple route to find the answer to a question, and if it cannot be found, tells the client to learn the word and send it to the DB to learn
 router.get('/find', function (req, res, next) {
+    console.log(req.query);
     stringWord.findOne(
         {
             prompt: req.query.prompt,
@@ -114,13 +160,15 @@ router.get('/find', function (req, res, next) {
             if (err) throw err;
             if (data) {
                 var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
+                var decoded = jwt.decode(token);
                 User.updateOne({ name: decoded.name }, { $inc: { availablePoints: config.weights.stringWordWeight * -1 } }, function (err, data) {
+                    console.log(err);
                     if (err) throw err;
                     console.log("Adding points to the user's profile");
-                    res.JSON({ answer: data.correctAnswer });
+                    res.json({ answer: data.correctAnswer });
                 });
             } else {
-                res.JSON({ error: 'SW1' })
+                res.json({ error: 'SW1' })
             }
         }
     );
