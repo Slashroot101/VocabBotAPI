@@ -40,6 +40,10 @@ router.use(function (req, res, next) {
   }
 });
 
+router.use(function(req, res, next){
+  
+});
+
 router.post('/create', function (req, res, next) {
   var newSentence = new sentenceWord({
     prompt: req.body.prompt,

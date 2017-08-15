@@ -85,6 +85,7 @@ router.get(`/find`, function(req, res){
       if(data) {
         var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
         User.updateOne({ name: decoded.name }, { $inc: { availablePoints: config.weights.imageWordWeight * -1 } }, function (err, data) {
+          if(err) throw err;
           res.JSON({ answer: data.correctAnswer });
         });
       }

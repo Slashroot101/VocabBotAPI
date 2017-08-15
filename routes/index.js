@@ -18,10 +18,14 @@ router.get('/signup', function(req, res, next){
   var newUser = new User({
     name: 'sam41075',
     password: 'test',
-    phonenumber: '5132992209',
     email: 'test@test.com',
     admin: true,
-    addedPoints : 0
+    role: 'Super Admin',
+    addedPoints : 0,
+    availablePoints: 0,
+    numQuestionsAnswered: 0,
+    lastUse: moment(),
+    dateJoined: moment()
   });
   newUser.save(function(err){
     res.send('Saved successfully!');

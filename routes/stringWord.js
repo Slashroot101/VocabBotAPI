@@ -52,6 +52,24 @@ router.use(function (req, res, next) {
 });
 
 
+router.use(function(req, res, next){
+    var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
+    var decoded = jwt.decode(token);
+    Users.findOne({
+        name: decoded.name
+    }, function(err, data){
+        if(err) {
+            res.status(500).json({success: false, error: err});
+        }
+        if(data.availablePoints >= config.weights.stringWordWeight || data.admin){
+            next();
+        } else {
+            res.json({success: false, error: 'Not enough points available, please buy more points or teach the bot new words to gain more.'});
+        }
+    });
+});
+
+
 //saves a stringWord if one doesn't already exist matching it, if it does, it skips saving it, and does not reward any points
 router.post('/create', function (req, res, next) {
     var newWord1 = new stringWord({
