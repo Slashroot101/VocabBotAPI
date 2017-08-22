@@ -36,7 +36,7 @@ router.get('/signup', function(req, res, next){
   router.post('/login', function(req, res) {
     console.log(req.body);
     User.findOne({
-       name: req.body.username
+       name: req.body.name
      }, function(err, user) {
        if (err) throw err;
 
@@ -47,7 +47,7 @@ router.get('/signup', function(req, res, next){
          user.comparePassword(req.body.password, function (err, isMatch) {
            if (isMatch && !err) {
              // if user is found and password is right create a token
-             var token = jwt.sign(user, String(config.secret), {
+             var token = jwt.sign({name: user.name}, String(config.secret), {
                expiresIn: 1440 // expires in 24 hours
              });
              // return the information including token as JSON

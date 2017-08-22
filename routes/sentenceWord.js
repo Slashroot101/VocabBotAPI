@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var sentenceWord = require('../DataModels/sentenceWord');
+var User = require('../DataModels/user');
 /* GET home page. */
 router.get('/', function (req, res, next) {
   res.render('index', { title: 'Express' });
@@ -40,9 +41,6 @@ router.use(function (req, res, next) {
   }
 });
 
-router.use(function(req, res, next){
-  
-});
 
 router.post('/create', function (req, res, next) {
   var newSentence = new sentenceWord({
