@@ -1,0 +1,5 @@
+You buy points, which means that each question can have its own weight. Image questions will be worth the msot.
+Startup config to allow you to skip the types of questions that cost more.
+
+$5 = 100 words
+100 points from adding new words = 10% off. Meaning 100% words will get you a free 100 words OR you can use it for a certain amount percentage discount on bulk words.

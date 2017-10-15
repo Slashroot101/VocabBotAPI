@@ -1,0 +1,10 @@
+StringWord Errors
+    SW1 : data could not be found -- has not been entered yet or there is some kind of error finding the data 
+
+
+SentenceWord Errors
+    SEW1 : data could not be found -- has not been entered yet or there is some kind of error in finding the data
+
+
+ImageWord Errors
+    IW1 : data could not be found -- has not been entered yet or there is some kind of error in finding the data
