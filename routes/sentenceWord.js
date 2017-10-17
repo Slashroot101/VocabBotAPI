@@ -2,6 +2,10 @@ var express = require('express');
 var router = express.Router();
 var sentenceWord = require('../DataModels/sentenceWord');
 var User = require('../DataModels/user');
+var jwt = require('jsonwebtoken');
+var cookie = require('cookie');
+var config = require('../config.js');
+var moment = require('moment');
 /* GET home page. */
 router.get('/', function (req, res, next) {
   res.render('index', { title: 'Express' });
@@ -43,6 +47,7 @@ router.use(function (req, res, next) {
 
 
 router.post('/create', function (req, res, next) {
+  console.log(req.body);
   var newSentence = new sentenceWord({
     prompt: req.body.prompt,
     choices: {
@@ -61,29 +66,29 @@ router.post('/create', function (req, res, next) {
     //structured query to find if there is a entry of this already in the DB. prompt and answers are the only thing that matters
     {
       prompt: { $eq: req.body.prompt },
-      "choices.a1": req.body.choices.a1,
-      "choices.a2": req.body.choices.a2,
-      "choices.a3": req.body.choicesa3,
-      "choices.a4": req.body.choices.a4,
+      "choices.a1": req.body.a1,
+      "choices.a2": req.body.a2,
+      "choices.a3": req.body.a3,
+      "choices.a4": req.body.a4,
       correctAnswer: req.body.correctAnswer
-    }
-  ), function (err, data) {
-    if (err) throw err;
-    if (!data) {
-      console.log(`Saving data! No duplicates found!`);
-      newSentence.save(function (err) {
-        if (err) throw err;
-        console.log(`Data successfully saved!`);
-        var decoded = jwt.decode(token);
-        console.log(decoded.name);
-        User.updateOne({ name: decoded.name }, { $inc: { addedPoints: 1 } }, function (err, data) {
+    }, function (err, data) {
+      if (err) throw err;
+      if (!data) {
+        console.log(`Saving data! No duplicates found!`);
+        newSentence.save(function (err) {
           if (err) throw err;
-          console.log("Adding points to the user's profile");
-          res.send({ status: 'Success!' });
+          console.log(`Data successfully saved!`);
+          var decoded = jwt.decode(token);
+          console.log(decoded.name);
+          User.updateOne({ name: decoded.name }, { $inc: { addedPoints: 1 } }, function (err, data) {
+            if (err) throw err;
+            console.log("Adding points to the user's profile");
+            res.send({ status: 'Success!' });
+          });
         });
-      });
+      }
     }
-  }
+  )
 });
 
 router.get(`/find`, function (req, res) {
