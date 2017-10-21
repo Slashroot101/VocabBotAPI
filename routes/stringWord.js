@@ -178,7 +178,7 @@ router.post('/create', function (req, res, next) {
                     });
                     var decoded = jwt.decode(token);
                     console.log(decoded.name);
-                    User.updateOne({ name: decoded.name }, { $inc: { addedPoints: 1 } }, function (err, data) {
+                    User.updateOne({ name: req.body.addedBy }, { $inc: { addedPoints: 1 } }, function (err, data) {
                         if (err) throw err;
                         res.json({ status: 'Success!' });
                     });
@@ -206,11 +206,11 @@ router.get('/find', function (req, res, next) {
             if (data) {
                 var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
                 var decoded = jwt.decode(token);
-                User.updateOne({ name: decoded.name }, { $inc: { availablePoints: config.weights.stringWordWeight * -1 } }, function (err, data) {
+                User.updateOne({ name: req.query.addedBy }, { $inc: { availablePoints: config.weights.stringWordWeight * -1 } }, function (err, data) {
                     console.log(err);
                     if (err) throw err;
                     console.log("Adding points to the user's profile");
-                    res.json({ answer: data.correctAnswer });
+                    res.json({ answer: data.answer });
                 });
             } else {
                 res.json({ error: 'SW1' })

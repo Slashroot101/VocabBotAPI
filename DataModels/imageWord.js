@@ -19,4 +19,4 @@ var imageWord = new Schema({
 });
 
 
-var User = mongoose.model('Image', imageWord);
+module.exports = mongoose.model('ImageWord', imageWord);

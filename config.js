@@ -6,6 +6,7 @@ module.exports =
         sentenceWordWeight: 1,
         stringWordWeight: 1,
         audioWordWeight: 1,
-        imageWordWeight: 1
+        imageWordWeight: 1,
+        paragraphWordWeight: 1
     }
 };

@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var sentenceWord = require('../DataModels/sentenceWord');
+var paragraphWord = require('../DataModels/paragraphWord');
 var User = require('../DataModels/user');
 var jwt = require('jsonwebtoken');
 var cookie = require('cookie');
@@ -48,7 +48,7 @@ router.use(function (req, res, next) {
 
 router.post('/create', function (req, res, next) {
   console.log(req.body);
-  var newSentence1 = new sentenceWord({
+  var newSentence1 = new paragraphWord({
     prompt: req.body.prompt,
     choices: {
       a1: req.body.a1,
@@ -61,7 +61,7 @@ router.post('/create', function (req, res, next) {
     addedBy: req.body.addedBy,
     lessonURL: req.body.lessonURL
   });
-  var newSentence2 = new sentenceWord({
+  var newSentence2 = new paragraphWord({
     prompt: req.body.prompt,
     choices: {
       a1: req.body.a4,
@@ -74,7 +74,7 @@ router.post('/create', function (req, res, next) {
     addedBy: req.body.addedBy,
     lessonURL: req.body.lessonURL
   });
-  var newSentence3 = new sentenceWord({
+  var newSentence3 = new paragraphWord({
     prompt: req.body.prompt,
     choices: {
       a1: req.body.a4,
@@ -87,7 +87,7 @@ router.post('/create', function (req, res, next) {
     addedBy: req.body.addedBy,
     lessonURL: req.body.lessonURL
   });
-  var newSentence4 = new sentenceWord({
+  var newSentence4 = new paragraphWord({
     prompt: req.body.prompt,
     choices: {
       a1: req.body.a1,
@@ -101,7 +101,7 @@ router.post('/create', function (req, res, next) {
     lessonURL: req.body.lessonURL
   });
   var token = req.body.token || req.query.token || req.headers[`x-access-token`] || req.cookies.token;
-  sentenceWord.findOne(
+  paragraphWord.findOne(
     //structured query to find if there is a entry of this already in the DB. prompt and answers are the only thing that matters
     {
       prompt: { $eq: req.body.prompt },
@@ -119,20 +119,19 @@ router.post('/create', function (req, res, next) {
           console.log(`Data successfully saved!`);
           var decoded = jwt.decode(token);
           console.log(decoded.name);
-          console.log('The receveied name is: ' + decoded.name);
           User.updateOne({ name: decoded.name }, { $inc: { addedPoints: 1 } }, function (err, data) {
             if (err) throw err;
-            console.log("Adding points to the user's profile");
-            res.send({ status: 'Success!' });
-          });
-          newSentence2.save(function(err2){
-            console.log(err2);
-          });
-          newSentence3.save(function(err3){
-            console.log(err3);
-          });
-          newSentence4.save(function(err4){
-            console.log(err4);
+            newSentence2.save(function(err2){
+              console.log(err2);
+              newSentence3.save(function(err3){
+                console.log(err3);
+                newSentence4.save(function(err4){
+                  console.log(err4);                  
+                  console.log("Adding points to the user's profile");
+                  res.send({ status: 'Success!' });
+                });
+              });
+            });
           });
         });
       }
@@ -141,7 +140,7 @@ router.post('/create', function (req, res, next) {
 });
 
 router.get(`/find`, function (req, res) {
-  sentenceWord.findOne(
+  paragraphWord.findOne(
     {
       prompt: req.query.prompt,
       "choices.a1": req.query.a1,
@@ -156,12 +155,9 @@ router.get(`/find`, function (req, res) {
       if (data) {
         var decoded = jwt.decode(token);
         var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
-        User.updateOne({ name: req.query.addedBy }, { $inc: { availablePoints: config.weights.sentenceWordWeight * -1 } }, function (err, data) {
-          console.log(err);
-          if (err) throw err;
-          console.log("Adding points to the user's profile");
+        User.updateOne({ name: decoded.name }, { $inc: { availablePoints: config.weights.paragraphWordWeight * -1 } }, function (err, userData) {
           res.json({ answer: data.answer });
-      });
+        });
       } else {
         res.json({ error: 'SEW1' });
       }
