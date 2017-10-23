@@ -10,6 +10,7 @@ var users = require('./routes/users');
 var stringWord = require('./routes/stringWord');
 var paragraphWord = require('./routes/paragraphWord');
 var imageWord = require('./routes/imageWord');
+var audioWord = require('./routes/audioWord');
 var app = express();
 
 // view engine setup
@@ -30,6 +31,7 @@ app.use('/stringWord', stringWord);
 app.use('/sentenceWord', sentenceWord);
 app.use('/paragraphWord', paragraphWord);
 app.use('/imageWord', imageWord);
+app.use('/audioWord', audioWord);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

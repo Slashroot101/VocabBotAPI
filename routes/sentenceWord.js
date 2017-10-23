@@ -47,99 +47,98 @@ router.use(function (req, res, next) {
 
 
 router.post('/create', function (req, res, next) {
-  console.log(req.body);
-  var newSentence1 = new sentenceWord({
-    prompt: req.body.prompt,
-    choices: {
-      a1: req.body.a1,
-      a2: req.body.a2,
-      a3: req.body.a3,
-      a4: req.body.a4
-    },
-    correctAnswer: req.body.correctAnswer,
-    dateCreated: moment(),
-    addedBy: req.body.addedBy,
-    lessonURL: req.body.lessonURL
+  console.log(`Posting string word!`);
+  var newWord1 = new sentenceWord({
+      prompt: req.body.prompt,
+      choices: {
+          a1: req.body.a1,
+          a2: req.body.a2,
+          a3: req.body.a3,
+          a4: req.body.a4
+      },
+      correctAnswer: req.body.correctAnswer,
+      dateCreated: moment(),
+      addedBy: req.body.addedBy,
+      lessonURL: req.body.lessonURL
   });
-  var newSentence2 = new sentenceWord({
-    prompt: req.body.prompt,
-    choices: {
-      a1: req.body.a4,
-      a2: req.body.a3,
-      a3: req.body.a2,
-      a4: req.body.a1
-    },
-    correctAnswer: req.body.correctAnswer,
-    dateCreated: moment(),
-    addedBy: req.body.addedBy,
-    lessonURL: req.body.lessonURL
+  var newWord2 = new sentenceWord({
+      prompt: req.body.prompt,
+      choices: {
+          a1: req.body.a4,
+          a2: req.body.a3,
+          a3: req.body.a2,
+          a4: req.body.a1
+      },
+      correctAnswer: req.body.correctAnswer,
+      dateCreated: moment(),
+      addedBy: req.body.addedBy,
+      lessonURL: req.body.lessonURL
   });
-  var newSentence3 = new sentenceWord({
-    prompt: req.body.prompt,
-    choices: {
-      a1: req.body.a4,
-      a2: req.body.a2,
-      a3: req.body.a3,
-      a4: req.body.a1
-    },
-    correctAnswer: req.body.correctAnswer,
-    dateCreated: moment(),
-    addedBy: req.body.addedBy,
-    lessonURL: req.body.lessonURL
+  var newWord3 = new sentenceWord({
+      prompt: req.body.prompt,
+      choices: {
+          a1: req.body.a4,
+          a2: req.body.a2,
+          a3: req.body.a3,
+          a4: req.body.a1
+      },
+      correctAnswer: req.body.correctAnswer,
+      dateCreated: moment(),
+      addedBy: req.body.addedBy,
+      lessonURL: req.body.lessonURL
   });
-  var newSentence4 = new sentenceWord({
-    prompt: req.body.prompt,
-    choices: {
-      a1: req.body.a1,
-      a2: req.body.a3,
-      a3: req.body.a2,
-      a4: req.body.a4
-    },
-    correctAnswer: req.body.correctAnswer,
-    dateCreated: moment(),
-    addedBy: req.body.addedBy,
-    lessonURL: req.body.lessonURL
+  var newWord4 = new sentenceWord({
+      prompt: req.body.prompt,
+      choices: {
+          a1: req.body.a1,
+          a2: req.body.a3,
+          a3: req.body.a2,
+          a4: req.body.a4
+      },
+      correctAnswer: req.body.correctAnswer,
+      dateCreated: moment(),
+      addedBy: req.body.addedBy,
+      lessonURL: req.body.lessonURL
   });
-  var token = req.body.token || req.query.token || req.headers[`x-access-token`] || req.cookies.token;
+  console.log('Looking for possible duplicates of the word.');
+  var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
   sentenceWord.findOne(
-    //structured query to find if there is a entry of this already in the DB. prompt and answers are the only thing that matters
-    {
-      prompt: { $eq: req.body.prompt },
-      "choices.a1": req.body.a1,
-      "choices.a2": req.body.a2,
-      "choices.a3": req.body.a3,
-      "choices.a4": req.body.a4,
-      correctAnswer: req.body.correctAnswer
-    }, function (err, data) {
-      if (err) throw err;
-      if (!data) {
-        console.log(`Saving data! No duplicates found!`);
-        newSentence1.save(function (err) {
+      //structured query to find if there is a entry of this already in the DB. prompt and answers are the only thing that matters
+      {
+          prompt: { $eq: req.body.prompt },
+          "choices.a1": req.body.a1,
+          "choices.a2": req.body.a2,
+          "choices.a3": req.body.a3,
+          "choices.a4": req.body.a4,
+          correctAnswer: req.body.correctAnswer
+      }, function (err, data) {
           if (err) throw err;
-          console.log(`Data successfully saved!`);
-          var decoded = jwt.decode(token);
-          console.log(decoded.name);
-          console.log('The receveied name is: ' + decoded.name);
-          User.updateOne({ name: decoded.name }, { $inc: { addedPoints: 1 } }, function (err, data) {
-            if (err) throw err;
-            console.log("Adding points to the user's profile");
-            res.send({ status: 'Success!' });
-          });
-          newSentence2.save(function(err2){
-            console.log(err2);
-          });
-          newSentence3.save(function(err3){
-            console.log(err3);
-          });
-          newSentence4.save(function(err4){
-            console.log(err4);
-          });
-        });
-      }
-    }
-  )
-});
+          if (!data) {
+              newWord1.save(function (err) {
+                  if (err) throw err;
+                  newWord2.save(function (errNewWord2) {
+                      if (errNewWord2) throw errNewWord2;
+                      newWord3.save(function (errNewWord3) {
+                          if (errNewWord3) throw errNewWord3;
+                          newWord4.save(function (errNewWord4) {
+                              if (errNewWord4) throw errNewWord4;
+                          });
+                      });
+                  });
+                  var decoded = jwt.decode(token);
+                  console.log(decoded.name);
+                  User.updateOne({ name: req.body.addedBy }, { $inc: { addedPoints: 1 } }, function (err, data) {
+                      if (err) throw err;
+                      res.json({ status: 'Success!' });
+                  });
+              });
 
+          } else {
+              console.log('Duplicate was found.');
+              res.json({ status: false, message: 'Data was already entered' });
+          }
+      });
+});
 router.get(`/find`, function (req, res) {
   sentenceWord.findOne(
     {

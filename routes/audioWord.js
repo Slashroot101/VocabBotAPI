@@ -58,7 +58,7 @@ router.use(function (req, res, next) {
 
 //simple route to find the answer to a question, and if it cannot be found, tells the client to learn the word and send it to the DB to learn
 router.get('/find', function (req, res, next) {
-    stringWord.findOne(
+    audioWord.findOne(
         {
             prompt: req.query.prompt
             //in this case, we cannot query for correct answer, because they will not have that data available when answering the question
@@ -69,10 +69,10 @@ router.get('/find', function (req, res, next) {
                 User.updateOne({ name: decoded.name }, { $inc: { availablePoints: config.weights.audioWordWeight * -1 } }, function (err, data) {
                     if (err) throw err;
                     console.log("Adding points to the user's profile");
-                    res.JSON({ answer: data.correctAnswer });
+                    res.json({ answer: data.answer });
                 });
             } else {
-                res.JSON({ error: 'AW1' })
+                res.json({ error: 'AW1' })
             }
         }
     );
@@ -88,7 +88,7 @@ router.post('/create', function (req, res, next) {
     });
     console.log('Looking for possible duplicates of the word.');
     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
-    stringWord.findOne(
+    audioWord.findOne(
         //structured query to find if there is a entry of this already in the DB. prompt and answers are the only thing that matters
         {
             prompt: { $eq: req.body.prompt },
@@ -100,17 +100,16 @@ router.post('/create', function (req, res, next) {
                 newWord.save(function (err) {
                     if (err) throw err;
                     console.log('Data successfuly saved!');
-                    var decoded = jwt.decode(token);
-                    console.log(decoded.name);
-                    User.updateOne({ name: decoded.name }, { $inc: { addedPoints: 1 } }, function (err, data) {
+                    User.updateOne({ name: req.body.addedBy }, { $inc: { addedPoints: 1 } }, function (err, data) {
                         if (err) throw err;
                         console.log("Adding points to the user's profile");
-                        res.JSON({ status: 'Success!' });
+                        res.json({ status: 'Success!' });
                     });
                 });
             } else {
                 console.log('Duplicate was found.');
-                res.JSON({ status: false, message: 'Data was already entered' });
+                res.json({ status: false, message: 'Data was already entered' });
             }
         });
 });
+module.exports = router;
