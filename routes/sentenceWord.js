@@ -45,6 +45,28 @@ router.use(function (req, res, next) {
   }
 });
 
+router.use(function(req, res, next){
+    var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
+    var decoded = jwt.decode(token);
+    console.log(decoded.name);
+    User.findOne({
+        name: decoded.name
+    }, function(err, data){
+        if(err) {
+            console.log(err);
+            res.status(500).json({
+                status: false,
+                message: err
+            });
+        }
+        if(data.availablePoints >= config.weights.sentenceWordWeight || data.admin){
+            next();
+        } else {
+            res.json({success: false, error: 'Not enough points available, please buy more points or teach the bot new words to gain more.'});
+        }
+        //console.log(data);
+    });
+});
 
 router.post('/create', function (req, res, next) {
   console.log(`Posting string word!`);

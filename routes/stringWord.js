@@ -40,37 +40,11 @@ router.use(function (req, res, next) {
         });
 
     } else {
-
-        // if there is no token
-        // return an error
-        /*return res.status(403).send({
-            success: false,
-            message: 'No token provided.'
-        });
-        */
         res.json({ success: false, error: 'Token not provided or a bad token was provided. Please login and retry.' });
     }
 });
 
-/*
-router.use(function(req, res, next){
-    var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
-    var decoded = jwt.decode(token);
-    console.log(decoded);
-    User.findOne({
-        name: decoded.name
-    }, function(err, data){
-        console.log(data);
-        if(err) {
-            res.status(500).json({success: false, error: err});
-        }
-        if(data.availablePoints >= config.weights.stringWordWeight || data.admin){
-            next();
-        } else {
-            res.json({success: false, error: 'Not enough points available, please buy more points or teach the bot new words to gain more.'});
-        }
-    });
-}); */
+
 
 router.use(function(req, res, next){
     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;

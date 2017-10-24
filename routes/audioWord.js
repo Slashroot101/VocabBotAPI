@@ -51,6 +51,29 @@ router.use(function (req, res, next) {
     }
 });
 
+router.use(function(req, res, next){
+    var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
+    var decoded = jwt.decode(token);
+    console.log(decoded.name);
+    User.findOne({
+        name: decoded.name
+    }, function(err, data){
+        if(err) {
+            console.log(err);
+            res.status(500).json({
+                status: false,
+                message: err
+            });
+        }
+        if(data.availablePoints >= config.weights.audioWordWeight || data.admin){
+            next();
+        } else {
+            res.json({success: false, error: 'Not enough points available, please buy more points or teach the bot new words to gain more.'});
+        }
+        //console.log(data);
+    });
+});
+
 //simple route to find the answer to a question, and if it cannot be found, tells the client to learn the word and send it to the DB to learn
 router.get('/find', function (req, res, next) {
     audioWord.findOne(
