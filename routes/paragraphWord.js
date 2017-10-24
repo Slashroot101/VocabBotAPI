@@ -118,8 +118,7 @@ router.post('/create', function (req, res, next) {
           if (err) throw err;
           console.log(`Data successfully saved!`);
           var decoded = jwt.decode(token);
-          console.log(decoded.name);
-          User.updateOne({ name: decoded.name }, { $inc: { addedPoints: 1 } }, function (err, data) {
+          User.updateOne({ name: req.body.addedBy }, { $inc: { addedPoints: 1 } }, function (err, data) {
             if (err) throw err;
             newSentence2.save(function(err2){
               console.log(err2);
@@ -155,7 +154,7 @@ router.get(`/find`, function (req, res) {
       if (data) {
         var decoded = jwt.decode(token);
         var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
-        User.updateOne({ name: decoded.name }, { $inc: { availablePoints: config.weights.paragraphWordWeight * -1 } }, function (err, userData) {
+        User.updateOne({ name: req.body.addedBy }, { $inc: { availablePoints: config.weights.paragraphWordWeight * -1 } }, function (err, userData) {
           res.json({ answer: data.answer });
         });
       } else {

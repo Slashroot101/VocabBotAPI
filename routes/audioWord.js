@@ -13,11 +13,6 @@ router.use(express.static('./public/home'));
 router.use(bodyParser());
 
 
-try {
-    mongoose.connect(config.database);
-} catch (err){
-    res.status(500).json(err);
-}
 
 router.get('/', function (req, res, next) {
     res.send("Hello! The API is responding at localhost:3000!");
@@ -66,7 +61,7 @@ router.get('/find', function (req, res, next) {
             if (err) throw err;
             if (data) {
                 var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
-                User.updateOne({ name: decoded.name }, { $inc: { availablePoints: config.weights.audioWordWeight * -1 } }, function (err, data) {
+                User.updateOne({ name: req.body.addedBy }, { $inc: { availablePoints: config.weights.audioWordWeight * -1 } }, function (err, data) {
                     if (err) throw err;
                     console.log("Adding points to the user's profile");
                     res.json({ answer: data.answer });
