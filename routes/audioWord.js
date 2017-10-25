@@ -76,6 +76,7 @@ router.use(function(req, res, next){
 
 //simple route to find the answer to a question, and if it cannot be found, tells the client to learn the word and send it to the DB to learn
 router.get('/find', function (req, res, next) {
+    console.log(req.query.prompt);
     audioWord.findOne(
         {
             prompt: req.query.prompt
@@ -84,10 +85,9 @@ router.get('/find', function (req, res, next) {
             if (err) throw err;
             if (data) {
                 var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
-                User.updateOne({ name: req.body.addedBy }, { $inc: { availablePoints: config.weights.audioWordWeight * -1 } }, function (err, data) {
+                User.updateOne({ name: req.body.addedBy }, { $inc: { availablePoints: config.weights.audioWordWeight * -1 } }, function (err, dataUser) {
                     if (err) throw err;
-                    console.log("Adding points to the user's profile");
-                    res.json({ answer: data.answer });
+                    res.json({ answer: data.correctAnswer });
                 });
             } else {
                 res.json({ error: 'AW1' })

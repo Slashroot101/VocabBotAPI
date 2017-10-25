@@ -162,6 +162,7 @@ router.post('/create', function (req, res, next) {
       });
 });
 router.get(`/find`, function (req, res) {
+    console.log(req.query.prompt);
   sentenceWord.findOne(
     {
       prompt: req.query.prompt,
@@ -177,11 +178,11 @@ router.get(`/find`, function (req, res) {
       if (data) {
         var decoded = jwt.decode(token);
         var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
-        User.updateOne({ name: req.query.addedBy }, { $inc: { availablePoints: config.weights.sentenceWordWeight * -1 } }, function (err, data) {
+        User.updateOne({ name: req.query.addedBy }, { $inc: { availablePoints: config.weights.sentenceWordWeight * -1 } }, function (err, dataUser) {
           console.log(err);
           if (err) throw err;
           console.log("Adding points to the user's profile");
-          res.json({ answer: data.answer });
+          res.json({ answer: data.correctAnswer });
       });
       } else {
         res.json({ error: 'SEW1' });

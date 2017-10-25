@@ -162,6 +162,7 @@ router.post('/create', function (req, res, next) {
 });
 
 router.get(`/find`, function (req, res) {
+  console.log(req.query.prompt);
   imageWord.findOne(
     {
       prompt: req.query.prompt,
@@ -177,8 +178,8 @@ router.get(`/find`, function (req, res) {
       if (data) {
         var decoded = jwt.decode(token);
         var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
-        User.updateOne({ name: req.body.addedBy }, { $inc: { availablePoints: config.weights.imageWordWeight * -1 } }, function (err, data) {
-          res.json({ answer: data.answer });
+        User.updateOne({ name: req.body.addedBy }, { $inc: { availablePoints: config.weights.imageWordWeight * -1 } }, function (err, dataUser) {
+          res.json({ answer: data.correctAnswer });
         });
       } else {
         res.json({ error: 'SEW1' });

@@ -166,6 +166,7 @@ router.post('/create', function (req, res, next) {
 });
 //simple route to find the answer to a question, and if it cannot be found, tells the client to learn the word and send it to the DB to learn
 router.get('/find', function (req, res, next) {
+    console.log(req.query.prompt);
     console.log(req.query);
     stringWord.findOne(
         {
@@ -180,11 +181,11 @@ router.get('/find', function (req, res, next) {
             if (data) {
                 var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
                 var decoded = jwt.decode(token);
-                User.updateOne({ name: req.query.addedBy }, { $inc: { availablePoints: config.weights.stringWordWeight * -1 } }, function (err, data) {
+                User.updateOne({ name: req.query.addedBy }, { $inc: { availablePoints: config.weights.stringWordWeight * -1 } }, function (err, dataUser) {
                     console.log(err);
                     if (err) throw err;
                     console.log("Adding points to the user's profile");
-                    res.json({ answer: data.answer });
+                    res.json({ answer: data.correctAnswer });
                 });
             } else {
                 res.json({ error: 'SW1' })

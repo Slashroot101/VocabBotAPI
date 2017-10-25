@@ -60,6 +60,33 @@ router.get('/signup', function(req, res, next){
      });
   });
 
+  router.post('/frontLogin', function(req, res) {
+    User.findOne({
+       name: req.body.username
+     }, function(err, user) {
+       if (err) throw err;
+
+       if (!user) {
+         res.send({success: false, msg: 'Authentication failed. User not found.'});
+       } else {
+         // check if password matches
+         user.comparePassword(req.body.password, function (err, isMatch) {
+           if (isMatch && !err) {
+             // if user is found and password is right create a token
+             var token = jwt.sign(user, String(config.secret), {
+               expiresIn: 1440 // expires in 24 hours
+             });
+             // return the information including token as JSON
+             res.cookie('token', token, { maxAge: 900000, httpOnly: true });
+             res.redirect('/start');
+           } else {
+             res.send({success: false, msg: 'Authentication failed. Wrong password.'});
+           }
+         });
+       }
+     });
+  });
+
 
 
 

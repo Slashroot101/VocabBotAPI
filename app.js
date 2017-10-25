@@ -10,6 +10,7 @@ var users = require('./routes/users');
 var stringWord = require('./routes/stringWord');
 var paragraphWord = require('./routes/paragraphWord');
 var imageWord = require('./routes/imageWord');
+var queue = require('./routes/queue');
 var audioWord = require('./routes/audioWord');
 var app = express();
 
@@ -32,7 +33,7 @@ app.use('/sentenceWord', sentenceWord);
 app.use('/paragraphWord', paragraphWord);
 app.use('/imageWord', imageWord);
 app.use('/audioWord', audioWord);
-
+app.use('/queue', queue);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');

@@ -14,4 +14,4 @@ var paragraphWord = new Schema({
     lessonURL: String
 });
 
-module.exports = mongoose.model('paragraphWord', paragraphWord);
+module.exports = mongoose.model('ParagraphWord', paragraphWord);
