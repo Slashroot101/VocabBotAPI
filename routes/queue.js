@@ -1,12 +1,14 @@
 var express = require('express');
 var router = express.Router();
 var jwt = require('jsonwebtoken');
-var queue = require('../DataModels/queue');
+var Queue = require('../DataModels/queue');
 var moment = require('moment');
-
-
+var cookie = require('cookie');
+var config = require('../config');
+var User = require('../DataModels/user');
 //route middlware to verify token
 router.use(function (req, res, next) {
+    console.log(req.body);
     let cookies = cookie.parse(req.headers.cookie || '');
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
@@ -38,25 +40,78 @@ router.use(function (req, res, next) {
     }
 });
 
-router.post('/queue', function(req, res){
+router.post('/', function(req, res){
     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
     var decoded = jwt.decode(token);
-    var newQueue = new queue({
-        name: decoded.name,
-        timeQueued: moment(),
-        timeDue: moment(req.body.timeDue),
-        completed: false,
-        completePercent: 0
+    console.log(decoded);
+    User.findOne({name : decoded.name}, function(err, data){
+        if(err){
+            res.status(500).json(err);
+        } else {
+           
+    var newQueue = new Queue({
+        meta : {
+            timeQueued: moment(),
+            timeDue: moment(req.body.timeDue)
+        },
+        completionData : {
+            completed : false,
+            completePercent: 0,
+            inProgress: false
+        },
+        config: {
+            apiLogin : {
+                username: decoded.name,
+                password: data.password
+            },
+            user : {
+                username: req.body.user.username,
+                password: req.body.user.password
+            },
+            assignmentURL: req.body.assignmentURL
+        }
     });
 
-    newQueue.save(function(err, data){
+    newQueue.save(function(err, data2){
         if(err){
-            res.status(500),json(err);
+            res.status(500).json(err);
         }
-        res.json(data);
+        res.json(data2);
     });
+        }
+    });
+
+
 });
 
+
+router.get('/currentTask', function(req, res){
+    Queue.find(
+        {
+            "completionData.completed" : false,
+            "completionData.inProgress" : false
+        }, null, {
+            sort: 'meta.timeDue',
+            limit: 1
+        }, function(err, data) { 
+            if(err){
+                res.status(500).json({err});
+            }
+            if(data[0]._id === undefined){
+                res.status(500).json({err: 'Nothing in the queue'});
+            }
+            Queue.update(
+                {
+                    _id : data[0]._id
+                },
+                {
+                    "completionData.inProgress" : true
+                }, function(err, data2){
+                    res.json(data);
+                }
+            )
+    });
+});
 
 
 
