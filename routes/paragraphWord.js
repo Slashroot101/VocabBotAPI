@@ -31,7 +31,10 @@ router.use(function (req, res, next) {
         jwt.verify(token, config.secret, function (err, decoded) {
             if (err) {
                 console.log(req.query.token);
-                return res.json({ success: false, message: 'Failed to authenticate token.' });
+                return res.json({
+                    success: false,
+                    message: 'Failed to authenticate token.'
+                });
             } else {
                 // if everything is good, save to request for use in other routes
                 req.decoded = decoded;
@@ -40,30 +43,36 @@ router.use(function (req, res, next) {
         });
 
     } else {
-        res.json({ success: false, error: 'Token not provided or a bad token was provided. Please login and retry.' });
+        res.json({
+            success: false,
+            error: 'Token not provided or a bad token was provided. Please login and retry.'
+        });
     }
 });
 
 
 
-router.use(function(req, res, next){
+router.use(function (req, res, next) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
     var decoded = jwt.decode(token);
     console.log(decoded.name);
     User.findOne({
         name: decoded.name
-    }, function(err, data){
-        if(err) {
+    }, function (err, data) {
+        if (err) {
             console.log(err);
             res.status(500).json({
                 status: false,
                 message: err
             });
         }
-        if(data.availablePoints >= config.weights.paragraphWordWeight || data.admin){
+        if (data.availablePoints >= config.weights.paragraphWordWeight || data.admin) {
             next();
         } else {
-            res.json({success: false, error: 'Not enough points available, please buy more points or teach the bot new words to gain more.'});
+            res.json({
+                success: false,
+                error: 'Not enough points available, please buy more points or teach the bot new words to gain more.'
+            });
         }
         //console.log(data);
     });
@@ -130,13 +139,16 @@ router.post('/create', function (req, res, next) {
     paragraphWord.findOne(
         //structured query to find if there is a entry of this already in the DB. prompt and answers are the only thing that matters
         {
-            prompt: { $eq: req.body.prompt },
+            prompt: {
+                $eq: req.body.prompt
+            },
             "choices.a1": req.body.a1,
             "choices.a2": req.body.a2,
             "choices.a3": req.body.a3,
             "choices.a4": req.body.a4,
             correctAnswer: req.body.correctAnswer
-        }, function (err, data) {
+        },
+        function (err, data) {
             if (err) throw err;
             if (!data) {
                 newWord1.save(function (err) {
@@ -152,15 +164,26 @@ router.post('/create', function (req, res, next) {
                     });
                     var decoded = jwt.decode(token);
                     console.log(decoded.name);
-                    User.updateOne({ name: req.body.addedBy }, { $inc: { addedPoints: 1 } }, function (err, data) {
+                    User.updateOne({
+                        name: req.body.addedBy
+                    }, {
+                        $inc: {
+                            addedPoints: 1
+                        }
+                    }, function (err, data) {
                         if (err) throw err;
-                        res.json({ status: 'Success!' });
+                        res.json({
+                            status: 'Success!'
+                        });
                     });
                 });
 
             } else {
                 console.log('Duplicate was found.');
-                res.json({ status: false, message: 'Data was already entered' });
+                res.json({
+                    status: false,
+                    message: 'Data was already entered'
+                });
             }
         });
 });
@@ -168,30 +191,38 @@ router.post('/create', function (req, res, next) {
 router.get('/find', function (req, res, next) {
     console.log(req.query.prompt);
     console.log(req.query);
-    paragraphWord.findOne(
-        {
-            prompt: req.query.prompt,
-            "choices.a1": req.query.a1,
-            "choices.a2": req.query.a2,
-            "choices.a3": req.query.a3,
-            "choices.a4": req.query.a4
-            //in this case, we cannot query for correct answer, because they will not have that data available when answering the question
-        }, function (err, data) {
-            if (err) throw err;
-            if (data) {
-                var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
-                var decoded = jwt.decode(token);
-                User.updateOne({ name: req.query.addedBy }, { $inc: { availablePoints: config.weights.paragraphWordWeight * -1 } }, function (err, dataUser) {
-                    console.log(err);
-                    if (err) throw err;
-                    console.log("Adding points to the user's profile");
-                    res.json({ answer: data.correctAnswer });
+    paragraphWord.findOne({
+        prompt: req.query.prompt,
+        "choices.a1": req.query.a1,
+        "choices.a2": req.query.a2,
+        "choices.a3": req.query.a3,
+        "choices.a4": req.query.a4
+        //in this case, we cannot query for correct answer, because they will not have that data available when answering the question
+    }, function (err, data) {
+        if (err) throw err;
+        if (data) {
+            var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
+            var decoded = jwt.decode(token);
+            User.updateOne({
+                name: req.query.addedBy
+            }, {
+                $inc: {
+                    availablePoints: config.weights.paragraphWordWeight * -1
+                }
+            }, function (err, dataUser) {
+                console.log(err);
+                if (err) throw err;
+                console.log("Adding points to the user's profile");
+                res.json({
+                    answer: data.correctAnswer
                 });
-            } else {
-                res.json({ error: 'SW1' })
-            }
+            });
+        } else {
+            res.json({
+                error: 'SW1'
+            })
         }
-    );
+    });
 });
 
 

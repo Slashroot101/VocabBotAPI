@@ -30,7 +30,10 @@ router.use(function (req, res, next) {
         // verifies secret and checks exp
         jwt.verify(token, config.secret, function (err, decoded) {
             if (err) {
-                return res.json({ success: false, message: 'Failed to authenticate token.' });
+                return res.json({
+                    success: false,
+                    message: 'Failed to authenticate token.'
+                });
             } else {
                 // if everything is good, save to request for use in other routes
                 req.decoded = decoded;
@@ -47,28 +50,34 @@ router.use(function (req, res, next) {
             message: 'No token provided.'
         });
         */
-        res.json({ success: false, error: 'Token not provided or a bad token was provided. Please login and retry.' });
+        res.json({
+            success: false,
+            error: 'Token not provided or a bad token was provided. Please login and retry.'
+        });
     }
 });
 
-router.use(function(req, res, next){
+router.use(function (req, res, next) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
     var decoded = jwt.decode(token);
     console.log(decoded.name);
     User.findOne({
         name: decoded.name
-    }, function(err, data){
-        if(err) {
+    }, function (err, data) {
+        if (err) {
             console.log(err);
             res.status(500).json({
                 status: false,
                 message: err
             });
         }
-        if(data.availablePoints >= config.weights.audioWordWeight || data.admin){
+        if (data.availablePoints >= config.weights.audioWordWeight || data.admin) {
             next();
         } else {
-            res.json({success: false, error: 'Not enough points available, please buy more points or teach the bot new words to gain more.'});
+            res.json({
+                success: false,
+                error: 'Not enough points available, please buy more points or teach the bot new words to gain more.'
+            });
         }
         //console.log(data);
     });
@@ -77,23 +86,31 @@ router.use(function(req, res, next){
 //simple route to find the answer to a question, and if it cannot be found, tells the client to learn the word and send it to the DB to learn
 router.get('/find', function (req, res, next) {
     console.log(req.query.prompt);
-    audioWord.findOne(
-        {
-            prompt: req.query.prompt
-            //in this case, we cannot query for correct answer, because they will not have that data available when answering the question
-        }, function (err, data) {
-            if (err) throw err;
-            if (data) {
-                var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
-                User.updateOne({ name: req.body.addedBy }, { $inc: { availablePoints: config.weights.audioWordWeight * -1 } }, function (err, dataUser) {
-                    if (err) throw err;
-                    res.json({ answer: data.correctAnswer });
+    audioWord.findOne({
+        prompt: req.query.prompt
+        //in this case, we cannot query for correct answer, because they will not have that data available when answering the question
+    }, function (err, data) {
+        if (err) throw err;
+        if (data) {
+            var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
+            User.updateOne({
+                name: req.body.addedBy
+            }, {
+                $inc: {
+                    availablePoints: config.weights.audioWordWeight * -1
+                }
+            }, function (err, dataUser) {
+                if (err) throw err;
+                res.json({
+                    answer: data.correctAnswer
                 });
-            } else {
-                res.json({ error: 'AW1' })
-            }
+            });
+        } else {
+            res.json({
+                error: 'AW1'
+            })
         }
-    );
+    });
 });
 
 router.post('/create', function (req, res, next) {
@@ -109,24 +126,38 @@ router.post('/create', function (req, res, next) {
     audioWord.findOne(
         //structured query to find if there is a entry of this already in the DB. prompt and answers are the only thing that matters
         {
-            prompt: { $eq: req.body.prompt },
+            prompt: {
+                $eq: req.body.prompt
+            },
             correctAnswer: req.body.correctAnswer
-        }, function (err, data) {
+        },
+        function (err, data) {
             if (err) throw err;
             if (!data) {
                 console.log('Saving data! No duplicates found!');
                 newWord.save(function (err) {
                     if (err) throw err;
                     console.log('Data successfuly saved!');
-                    User.updateOne({ name: req.body.addedBy }, { $inc: { addedPoints: 1 } }, function (err, data) {
+                    User.updateOne({
+                        name: req.body.addedBy
+                    }, {
+                        $inc: {
+                            addedPoints: 1
+                        }
+                    }, function (err, data) {
                         if (err) throw err;
                         console.log("Adding points to the user's profile");
-                        res.json({ status: 'Success!' });
+                        res.json({
+                            status: 'Success!'
+                        });
                     });
                 });
             } else {
                 console.log('Duplicate was found.');
-                res.json({ status: false, message: 'Data was already entered' });
+                res.json({
+                    status: false,
+                    message: 'Data was already entered'
+                });
             }
         });
 });
