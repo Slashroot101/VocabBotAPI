@@ -6,6 +6,41 @@ var moment = require('moment');
 var cookie = require('cookie');
 var config = require('../config');
 var User = require('../DataModels/user');
+
+
+router.get('/currentTask', function(req, res){
+    Queue.find(
+        {
+            "completionData.completed" : false,
+            "completionData.inProgress" : false
+        }, null, {
+            sort: 'meta.timeDue',
+            limit: 1
+        }, function(err, data) { 
+            if(err){
+                res.status(500).json({err});
+            }
+            if(data){
+                Queue.update(
+                    {
+                        _id : data[0]._id
+                    },
+                    {
+                        "completionData.inProgress" : true
+                    }, function(err, data2){
+                        if(err){
+                            res.status(500).json(err);
+                        }
+                        res.json(data);
+                    }
+                )
+            } else {
+                res.status(500).json({status: 'No data found'});
+            }
+ 
+    });
+
+
 //route middlware to verify token
 router.use(function (req, res, next) {
     console.log(req.body);
@@ -85,32 +120,6 @@ router.post('/', function(req, res){
 });
 
 
-router.get('/currentTask', function(req, res){
-    Queue.find(
-        {
-            "completionData.completed" : false,
-            "completionData.inProgress" : false
-        }, null, {
-            sort: 'meta.timeDue',
-            limit: 1
-        }, function(err, data) { 
-            if(err){
-                res.status(500).json({err});
-            }
-            if(data[0]._id === undefined){
-                res.status(500).json({err: 'Nothing in the queue'});
-            }
-            Queue.update(
-                {
-                    _id : data[0]._id
-                },
-                {
-                    "completionData.inProgress" : true
-                }, function(err, data2){
-                    res.json(data);
-                }
-            )
-    });
 });
 
 
