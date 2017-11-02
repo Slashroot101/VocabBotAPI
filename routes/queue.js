@@ -7,17 +7,16 @@ var cookie = require('cookie');
 var config = require('../config');
 var User = require('../DataModels/user');
 var promise = require('promise');
-const mongoWatch = require('mongo-watch')
-const watcher = mongoWatch({
-    format: 'pretty'
-})
+var util = require('util');
+var MongoStream = require('mongo-watch');
 
-// watch the collection 
-watcher.watch('test.users', event => {
-    // parse the results 
-    console.log('something changed:', event);
+var watcher = new MongoStream({format: 'normal', db: config.database, useMasterOplog:true});
+// watch the collection
+watcher.watch('VocabBot.queues', function(event) {
+  // parse the results
+  console.log(util.inspect(event, {showHidden: false, depth: null}));
+
 });
-
 
 
 
@@ -34,22 +33,27 @@ router.get('/currentTask', function (req, res) {
                 err
             });
         }
-        if (data) {
-            Queue.update({
-                _id: data[0]._id
-            }, {
-                "completionData.inProgress": true
-            }, function (err, data2) {
-                if (err) {
-                    res.status(500).json(err);
-                }
-                res.json(data);
-            })
-        } else {
-            res.status(500).json({
-                status: 'No data found'
-            });
+        try{
+            if (data[0]._id) {
+                Queue.update({
+                    _id: data[0]._id
+                }, {
+                    "completionData.inProgress": true
+                }, function (err, data2) {
+                    if (err) {
+                        res.status(500).json(err);
+                    }
+                    res.json(data);
+                })
+            } else {
+                res.status(500).json({
+                    status: 'No data found'
+                });
+            }
+        } catch (err){
+            console.log(err);
         }
+
 
     });
 
@@ -147,7 +151,7 @@ router.get('/currentTask', function (req, res) {
 
 
 
-router.get('/completeTask/:id', function (req, res) {
+router.post('/completeTask/:id', function (req, res) {
     Queue.findOneAndUpdate({
         _id: req.params.id
     }, {

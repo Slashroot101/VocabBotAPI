@@ -49,28 +49,27 @@ router.post('/login', function (req, res) {
       });
     } else {
       // check if password matches
-      user.comparePassword(req.body.password, function (err, isMatch) {
-        if (isMatch && !err) {
-          // if user is found and password is right create a token
-          var token = jwt.sign({
-            name: user.name
-          }, String(config.secret), {
-            expiresIn: 1440 // expires in 24 hours
-          });
-          // return the information including token as JSON
-          res.json({
-            token: token
-          });
-        } else {
-          res.send({
-            success: false,
-            msg: 'Authentication failed. Wrong password.'
-          });
+      User.findOne(
+        {
+          password : req.body.password
+        }, function(err, data){
+          if(err){
+            res.status(500).json(err);
+          } else {
+            var token = jwt.sign({
+              name: user.name
+            }, String(config.secret), {
+              expiresIn: 1440 // expires in 24 hours
+            });
+            res.json({token: token});
+          }
         }
-      });
+      );
     }
   });
 });
+
+
 
 router.post('/frontLogin', function (req, res) {
   User.findOne({
