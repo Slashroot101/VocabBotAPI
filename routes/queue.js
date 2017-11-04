@@ -9,13 +9,17 @@ var User = require('../DataModels/user');
 var promise = require('promise');
 var util = require('util');
 var MongoStream = require('mongo-watch');
-
+const { spawn } = require('child_process');
 var watcher = new MongoStream({format: 'normal', db: config.database, useMasterOplog:true});
 // watch the collection
 watcher.watch('VocabBot.queues', function(event) {
   // parse the results
   console.log(util.inspect(event, {showHidden: false, depth: null}));
-
+  console.log(event.oplist[0].path);
+  console.log(event.oplist[0].data);
+    if(event.oplist[0].path ==='completionData.inProgress' && event.oplist[0].data === false){
+        spawnBot();
+    }
 });
 
 
@@ -133,6 +137,7 @@ router.get('/currentTask', function (req, res) {
                 });
 
                 newQueue.save(function (err, data2) {
+                    spawnBot();
                     if (err) {
                         res.status(500).json(err);
                     }
@@ -151,13 +156,14 @@ router.get('/currentTask', function (req, res) {
 
 
 
-router.post('/completeTask/:id', function (req, res) {
+router.post('/completeTask/', function (req, res) {
+    console.log(req.body);
     Queue.findOneAndUpdate({
-        _id: req.params.id
+        _id: req.body.id
     }, {
-        "completionData.complete": true,
+        "completionData.completed": true,
         "completionData.inProgress": false,
-        "completionData.completePercemt": req.body.completepercecnt
+        "completionData.completePercent": req.body.completepercent
     }, function (err, data) {
         if (err) {
             throw err;
@@ -166,6 +172,34 @@ router.post('/completeTask/:id', function (req, res) {
         }
     });
 });
+
+function spawnBot(){
+    console.log('Spawning the bot!');
+    Queue.find(
+        {
+            "completionData.inProgress" : true,
+        }, function(err, data){
+            try {
+                if(data){
+                    return;
+                } else {
+                    const child = spawn('node', ['../VocabBot/cleaned.js']);
+                    child.stdout.on('data', (data) => {
+                        console.log(`child stdout:\n${data}`);
+
+                      });
+                      
+                      child.stderr.on('data', (data) => {
+                        console.error(`child stderr:\n${data}`);
+
+                      });
+                }
+            } catch (err){
+                res.status(500).json(err);
+            }
+        }
+    );
+}
 
 
 
