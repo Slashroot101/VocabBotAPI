@@ -9,7 +9,7 @@ var User = require('../DataModels/user');
 var promise = require('promise');
 var util = require('util');
 var MongoStream = require('mongo-watch');
-const { spawn } = require('child_process');
+const { exec } = require('child_process');
 var watcher = new MongoStream({format: 'normal', db: config.database, useMasterOplog:true});
 // watch the collection
 watcher.watch('VocabBot.queues', function(event) {
@@ -183,19 +183,17 @@ function spawnBot(){
                 if(data){
                     return;
                 } else {
-                    const child = spawn('node', ['../VocabBot/cleaned.js']);
-                    child.stdout.on('data', (data) => {
-                        console.log(`child stdout:\n${data}`);
-
-                      });
-                      
-                      child.stderr.on('data', (data) => {
-                        console.error(`child stderr:\n${data}`);
-
-                      });
+                    exec('node ../VocabBot/cleaned.js', function(error, stdout, stderr) {
+                        console.log('stdout: ', stdout);
+                        console.log('stderr: ', stderr);
+                        if (error !== null) {
+                            console.log('exec error: ', error);
+                            return;
+                        }
+                    });
                 }
             } catch (err){
-                res.status(500).json(err);
+                return;
             }
         }
     );
