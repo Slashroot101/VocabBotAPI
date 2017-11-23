@@ -98,10 +98,10 @@ router.post('/create', function (req, res, next) {
   var newSentence2 = new imageWord({
     prompt: req.body.prompt,
     choices: {
-      a1: req.body.a4,
-      a2: req.body.a3,
-      a3: req.body.a2,
-      a4: req.body.a1
+      a1: req.body.a1,
+      a2: req.body.a2,
+      a3: req.body.a4,
+      a4: req.body.a3
     },
     correctAnswer: req.body.correctAnswer,
     dateCreated: moment(),
@@ -109,19 +109,6 @@ router.post('/create', function (req, res, next) {
     lessonURL: req.body.lessonURL
   });
   var newSentence3 = new imageWord({
-    prompt: req.body.prompt,
-    choices: {
-      a1: req.body.a4,
-      a2: req.body.a2,
-      a3: req.body.a3,
-      a4: req.body.a1
-    },
-    correctAnswer: req.body.correctAnswer,
-    dateCreated: moment(),
-    addedBy: req.body.addedBy,
-    lessonURL: req.body.lessonURL
-  });
-  var newSentence4 = new imageWord({
     prompt: req.body.prompt,
     choices: {
       a1: req.body.a1,
@@ -134,6 +121,22 @@ router.post('/create', function (req, res, next) {
     addedBy: req.body.addedBy,
     lessonURL: req.body.lessonURL
   });
+  var newSentence4 = new imageWord({
+    prompt: req.body.prompt,
+    choices: {
+      a1: req.body.a1,
+      a2: req.body.a3,
+      a3: req.body.a4,
+      a4: req.body.a2
+    },
+    correctAnswer: req.body.correctAnswer,
+    dateCreated: moment(),
+    addedBy: req.body.addedBy,
+    lessonURL: req.body.lessonURL
+  });
+  
+  
+
   var token = req.body.token || req.query.token || req.headers[`x-access-token`] || req.cookies.token;
   imageWord.findOne(
     //structured query to find if there is a entry of this already in the DB. prompt and answers are the only thing that matters

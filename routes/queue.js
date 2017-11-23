@@ -9,15 +9,24 @@ var User = require('../DataModels/user');
 var promise = require('promise');
 var util = require('util');
 var MongoStream = require('mongo-watch');
-const { exec } = require('child_process');
-var watcher = new MongoStream({format: 'normal', db: config.database, useMasterOplog:true});
+const {
+    exec
+} = require('child_process');
+var watcher = new MongoStream({
+    format: 'normal',
+    db: config.database,
+    useMasterOplog: true
+});
 // watch the collection
-watcher.watch('VocabBot.queues', function(event) {
-  // parse the results
-  console.log(util.inspect(event, {showHidden: false, depth: null}));
-  console.log(event.oplist[0].path);
-  console.log(event.oplist[0].data);
-    if(event.oplist[0].path ==='completionData.inProgress' && event.oplist[0].data === false){
+watcher.watch('VocabBot.queues', function (event) {
+    // parse the results
+    console.log(util.inspect(event, {
+        showHidden: false,
+        depth: null
+    }));
+    console.log(event.oplist[0].path);
+    console.log(event.oplist[0].data);
+    if (event.oplist[0].path === 'completionData.inProgress' && event.oplist[0].data === false) {
         spawnBot();
     }
 });
@@ -37,25 +46,21 @@ router.get('/currentTask', function (req, res) {
                 err
             });
         }
-        try{
-            if (data[0]._id) {
-                Queue.update({
-                    _id: data[0]._id
-                }, {
-                    "completionData.inProgress": true
-                }, function (err, data2) {
-                    if (err) {
-                        res.status(500).json(err);
-                    }
-                    res.json(data);
-                })
-            } else {
-                res.status(500).json({
-                    status: 'No data found'
-                });
-            }
-        } catch (err){
-            console.log(err);
+        if (typeof data[0]._id !== undefined) {
+            Queue.update({
+                _id: data[0]._id
+            }, {
+                "completionData.inProgress": true
+            }, function (err, data2) {
+                if (err) {
+                    res.status(500).json(err);
+                }
+                res.json(data);
+            })
+        } else {
+            res.status(500).json({
+                status: 'No data found'
+            });
         }
 
 
@@ -158,45 +163,47 @@ router.get('/currentTask', function (req, res) {
 
 router.post('/completeTask/', function (req, res) {
     console.log(req.body);
-    Queue.findOneAndUpdate({
-        _id: req.body.id
-    }, {
-        "completionData.completed": true,
-        "completionData.inProgress": false,
-        "completionData.completePercent": req.body.completepercent
-    }, function (err, data) {
-        if (err) {
-            throw err;
-        } else {
-            res.json(data);
-        }
-    });
+    try {
+
+        Queue.findOneAndUpdate({
+            _id: req.body.id
+        }, {
+            "completionData.completed": true,
+            "completionData.inProgress": false,
+            "completionData.completePercent": req.body.completepercent
+        }, function (err, data) {
+            if (err) {
+                res.end();
+            } else {
+                spawnBot();
+                res.json(data);
+            }
+        });
+    } catch (err) {
+        res.end();
+    }
+
 });
 
-function spawnBot(){
+function spawnBot() {
     console.log('Spawning the bot!');
-    Queue.find(
-        {
-            "completionData.inProgress" : true,
-        }, function(err, data){
-            try {
-                if(data){
+    Queue.find({
+        "completionData.inProgress": true,
+    }, function (err, data) {
+        try {
+            exec('node ../VocabBot/cleaned.js', function (error, stdout, stderr) {
+                console.log('stdout: ', stdout);
+                console.log('stderr: ', stderr);
+                if (error !== null) {
+                    console.log('exec error: ', error);
                     return;
-                } else {
-                    exec('node ../VocabBot/cleaned.js', function(error, stdout, stderr) {
-                        console.log('stdout: ', stdout);
-                        console.log('stderr: ', stderr);
-                        if (error !== null) {
-                            console.log('exec error: ', error);
-                            return;
-                        }
-                    });
                 }
-            } catch (err){
-                return;
-            }
+            });
+        } catch (err) {
+            console.log(err);
+            return;
         }
-    );
+    });
 }
 
 

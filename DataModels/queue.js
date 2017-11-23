@@ -32,5 +32,4 @@ var queue = new Schema({
 
 
 
-
 module.exports = mongoose.model('Queue', queue);
