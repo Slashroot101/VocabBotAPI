@@ -10,10 +10,10 @@ var config = require('../config');
 mongoose.connect(config.database);
 /* GET home page. */
 router.get('/', function (req, res, next) {
-  res.render('index', {
-    title: 'Express'
-  });
+  res.sendFile(process.cwd()+'/views/index.html');
 });
+
+
 router.get('/signup', function (req, res, next) {
   console.log('Registering user!');
   //TODO: make an actual signup route
@@ -69,9 +69,8 @@ router.post('/login', function (req, res) {
   });
 });
 
-
-
 router.post('/frontLogin', function (req, res) {
+  console.log(req.body.username);
   User.findOne({
     name: req.body.username
   }, function (err, user) {
@@ -95,7 +94,7 @@ router.post('/frontLogin', function (req, res) {
             maxAge: 900000,
             httpOnly: true
           });
-          res.redirect('/start');
+          res.redirect('/overview');
         } else {
           res.send({
             success: false,
@@ -106,6 +105,54 @@ router.post('/frontLogin', function (req, res) {
     }
   });
 });
+
+
+    //route middlware to verify token
+    router.use(function (req, res, next) {
+      console.log(req.body);
+      let cookies = cookie.parse(req.headers.cookie || '');
+      // check header or url parameters or post parameters for token
+      var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
+
+      // decode token
+      if (token) {
+
+          // verifies secret and checks exp
+          jwt.verify(token, config.secret, function (err, decoded) {
+              if (err) {
+                  return res.json({
+                      success: false,
+                      message: 'Failed to authenticate token.'
+                  });
+              } else {
+                  // if everything is good, save to request for use in other routes
+                  req.decoded = decoded;
+                  next();
+              }
+          });
+
+      } else {
+
+          // if there is no token
+          // return an error
+          /*return res.status(403).send({
+              success: false,
+              message: 'No token provided.'
+          });
+          */
+          res.json({
+              success: false,
+              error: 'Token not provided or a bad token was provided. Please login and retry.'
+          });
+      }
+  });
+
+
+
+
+  router.get('/overview', function(req, res){
+
+  });
 
 
 
