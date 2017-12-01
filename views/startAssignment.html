@@ -1,0 +1,49 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" href="stylesheets/startAssignment.css">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<title>VocabBot Submit</title>
+</head>
+
+<body>
+    <div id="container">
+        <form  id = "formData">
+            <label for="timeDue">Time Due:</label>
+            <br>
+            <input type="date" id="timeDue" name="timeDue">
+            <br>
+            <label for="username">Username (Vocab.com):</label>
+            <input type="text" id="username" name="username">
+            <label for="password">Password (Vocab.com):</label>
+            <input type="password" id="password" name="password">
+            <label for="url">Assignment URL</label>
+            <input type="text" id="url" name="url">
+                <input id = "submit" type="submit" value="Submit">
+            </div><!--/ lower-->
+        </form>
+    </div>
+</body>
+
+<script>
+$("#formData").submit(function(event){
+    event.preventDefault();
+    var values = {};
+    $.each($('#formData').serializeArray(), function(i, field) {
+        values[field.name] = field.value;
+    });
+    console.log(values);
+    var postData = {};
+    postData.assignmentURL = values.url;
+    postData.username = values.username;
+    postData.password = values.password;
+    postData.timeDue = values.timeDue;
+    $.post("/queue/", postData, function(success){
+        console.log("Success!");
+    }).fail(function(err){
+        console.log(err);
+    });
+});
+</script>
+
+</html>

@@ -65,6 +65,7 @@ router.get('/currentTask', function (req, res) {
 
 
     });
+});
 
 
     //route middlware to verify token
@@ -109,13 +110,13 @@ router.get('/currentTask', function (req, res) {
 
     router.post('/', function (req, res) {
         var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
-        var decoded = jwt.decode(token);
-        console.log(decoded);
+        var decoded = jwt.verify(token, String(config.secret));
+        console.log(req.body);
         User.findOne({
-            name: decoded.name
+            name: decoded.user
         }, function (err, data) {
-            if (err) {
-                res.status(500).json(err);
+            if (err || data === null) {
+                res.status(500).json({msg : "There was an error creating your queue."});
             } else {
 
                 var newQueue = new Queue({
@@ -134,8 +135,8 @@ router.get('/currentTask', function (req, res) {
                             password: data.password
                         },
                         user: {
-                            username: req.body.user.username,
-                            password: req.body.user.password
+                            username: req.body.username,
+                            password: req.body.password
                         },
                         assignmentURL: req.body.assignmentURL
                     }
@@ -156,7 +157,7 @@ router.get('/currentTask', function (req, res) {
     });
 
 
-});
+
 
 
 

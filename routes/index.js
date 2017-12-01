@@ -86,7 +86,7 @@ router.post('/frontLogin', function (req, res) {
       user.comparePassword(req.body.password, function (err, isMatch) {
         if (isMatch && !err) {
           // if user is found and password is right create a token
-          var token = jwt.sign(user, String(config.secret), {
+          var token = jwt.sign({user: user.name}, String(config.secret), {
             expiresIn: 1440 // expires in 24 hours
           });
           // return the information including token as JSON
@@ -94,7 +94,7 @@ router.post('/frontLogin', function (req, res) {
             maxAge: 900000,
             httpOnly: true
           });
-          res.redirect('/overview');
+          res.redirect('/startAssignment');
         } else {
           res.send({
             success: false,
@@ -150,8 +150,8 @@ router.post('/frontLogin', function (req, res) {
 
 
 
-  router.get('/overview', function(req, res){
-
+  router.get('/startAssignment', function(req, res){
+    res.sendFile(process.cwd() + '/views/startAssignment.html');
   });
 
 
