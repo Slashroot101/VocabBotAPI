@@ -70,7 +70,6 @@ router.get('/currentTask', function (req, res) {
 
     //route middlware to verify token
     router.use(function (req, res, next) {
-        console.log(req.body);
         let cookies = cookie.parse(req.headers.cookie || '');
         // check header or url parameters or post parameters for token
         var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
@@ -109,13 +108,12 @@ router.get('/currentTask', function (req, res) {
     });
 
     router.post('/', function (req, res) {
-        var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
-        var decoded = jwt.verify(token, String(config.secret));
-        console.log(req.body);
+        console.log(req.decoded);
         User.findOne({
-            name: decoded.user
+            name: req.decoded.name
         }, function (err, data) {
             if (err || data === null) {
+                console.log(err);
                 res.status(500).json({msg : "There was an error creating your queue."});
             } else {
 
@@ -131,7 +129,7 @@ router.get('/currentTask', function (req, res) {
                     },
                     config: {
                         apiLogin: {
-                            username: decoded.name,
+                            username: data.name,
                             password: data.password
                         },
                         user: {
@@ -143,11 +141,13 @@ router.get('/currentTask', function (req, res) {
                 });
 
                 newQueue.save(function (err, data2) {
-                    spawnBot();
                     if (err) {
                         res.status(500).json(err);
+                    } else {
+                        spawnBot();
+                        res.json(data2);
                     }
-                    res.json(data2);
+
 
                 });
             }

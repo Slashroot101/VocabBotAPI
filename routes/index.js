@@ -56,9 +56,7 @@ router.post('/login', function (req, res) {
           if(err){
             res.status(500).json(err);
           } else {
-            var token = jwt.sign({
-              name: user.name
-            }, String(config.secret), {
+            var token = jwt.sign(user, String(config.secret), {
               expiresIn: 1440 // expires in 24 hours
             });
             res.json({token: token});
@@ -86,7 +84,7 @@ router.post('/frontLogin', function (req, res) {
       user.comparePassword(req.body.password, function (err, isMatch) {
         if (isMatch && !err) {
           // if user is found and password is right create a token
-          var token = jwt.sign({user: user.name}, String(config.secret), {
+          var token = jwt.sign(user, String(config.secret), {
             expiresIn: 1440 // expires in 24 hours
           });
           // return the information including token as JSON
