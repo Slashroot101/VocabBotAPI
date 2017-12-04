@@ -58,11 +58,11 @@ router.use(function (req, res, next) {
 });
 
 router.use(function (req, res, next) {
+    console.log('Checking middleware functions in audioWord!');
     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.cookies.token;
-    var decoded = jwt.decode(token);
-    console.log(decoded.name);
+    console.log(req.decoded._doc.name);
     User.findOne({
-        name: decoded.name
+        name: req.decoded._doc.name
     }, function (err, data) {
         if (err) {
             console.log(err);
