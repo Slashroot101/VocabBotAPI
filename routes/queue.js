@@ -196,19 +196,20 @@ function spawnBot() {
     Queue.find({
         "completionData.inProgress": true,
     }, function (err, data) {
-        try {
-            exec('node ../VocabBot/cleaned.js', function (error, stdout, stderr) {
-                console.log('stdout: ', stdout);
-                console.log('stderr: ', stderr);
-                if (error !== null) {
-                    console.log('exec error: ', error);
-                    return;
-                }
-            });
-        } catch (err) {
-            console.log(err);
+        console.log(data);
+        if(data.length === 0){
+                exec('node ../VocabBot/cleaned.js', function (error, stdout, stderr) {
+                    console.log('stdout: ', stdout);
+                    console.log('stderr: ', stderr);
+                    if (error !== null) {
+                        console.log('exec error: ', error);
+                        return;
+                    }
+                });
+        } else {
             return;
         }
+
     });
 }
 
