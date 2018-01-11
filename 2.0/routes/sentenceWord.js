@@ -1,11 +1,11 @@
 var express = require('express');
 var router = express.Router();
-var stringWord = require('../Models/stringWord');
+var sentenceWord = require('../Models/sentenceWord');
 var moment = require('moment');
 
 
 router.get('/', function(req, res){
-        stringWord.find(
+        sentenceWord.find(
             {
                 "question.prompt" : req.query.prompt,
                 "question.a1" : req.query.a1,
@@ -44,7 +44,7 @@ router.get('/', function(req, res){
 
 
 router.delete('/:id', function(req, res){
-        stringWord.deleteOne(
+        sentenceWord.deleteOne(
             {
                 _id : new MongoId(req.params.id)
             }, function(err){
@@ -74,7 +74,7 @@ router.post('/new', function(req, res){
         } else {
             var timesCorrect = 0;
         }
-        var newStringWord = new stringWord(
+        var newsentenceWord = new sentenceWord(
             {
                 question: {
                     prompt: req.body.question.prompt,
@@ -98,7 +98,7 @@ router.post('/new', function(req, res){
             }
         );
 
-        newStringWord.save(function(err, data){
+        newsentenceWord.save(function(err, data){
                 if(err){
                     return res.status(500).json(
                         {

@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var stringWord = new Schema(
+var sentenceWord = new Schema(
     {
         question: {
             prompt: {
@@ -58,4 +58,4 @@ var stringWord = new Schema(
     }
 );
 
-module.exports = mongoose.model('StringWord', stringWord);
+module.exports = mongoose.model('SentenceWord', sentenceWord);
