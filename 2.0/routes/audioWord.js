@@ -1,11 +1,11 @@
 var express = require('express');
 var router = express.Router();
-var paragraphWord = require('../Models/paragraphWord');
+var audioWord = require('../Models/audioWord');
 var moment = require('moment');
 
 
 router.get('/', function(req, res){
-        paragraphWord.find(
+        audioWord.find(
             {
                 "question.prompt" : req.query.prompt
             }, function(err, data){
@@ -40,7 +40,7 @@ router.get('/', function(req, res){
 
 
 router.delete('/:id', function(req, res){
-        paragraphWord.deleteOne(
+        audioWord.deleteOne(
             {
                 _id : new MongoId(req.params.id)
             }, function(err){
@@ -70,7 +70,7 @@ router.post('/new', function(req, res){
         } else {
             var timesCorrect = 0;
         }
-        var newparagraphWord = new paragraphWord(
+        var newaudioWord = new audioWord(
             {
                 question: {
                     prompt: req.body.question.prompt,
@@ -90,7 +90,7 @@ router.post('/new', function(req, res){
             }
         );
 
-        newparagraphWord.save(function(err, data){
+        newaudioWord.save(function(err, data){
                 if(err){
                     return res.status(500).json(
                         {
