@@ -14,6 +14,7 @@ var imageWord = require('./routes/imageWord');
 var paragraphWord = require('./routes/paragraphWord');
 var oppositeWord = require('./routes/oppositeWord');
 var audioWord = require('./routes/audioWord');
+
 var app = express();
 
 // view engine setup
@@ -29,7 +30,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-app.use('/users', users);
+app.use('/api/users', users);
 app.use('/api/stringWord', stringWord)
 app.use('/api/sentenceWord', sentenceWord);
 app.use('/api/oppositeWord', oppositeWord);
