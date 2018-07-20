@@ -1,14 +1,15 @@
 let User = require(`./models/User`);
 
 exports.create = async (user) => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async(resolve, reject) => {
         let newUser = new User({
             username: user.username,
             password: user.password,
             email: user.email,
             role: user.role
         });
-
-    await newUser.save();
+        
+        let savedUser = await newUser.save();
+        resolve(savedUser);
     });
 };
