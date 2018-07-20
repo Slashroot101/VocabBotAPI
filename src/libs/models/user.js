@@ -1,6 +1,6 @@
 const mongoose = require(`mongoose`);
 const Schema = mongoose.Schema;
-const bcrypt = require(`bcrypt`)
+const bcrypt = require(`bcrypt-nodejs`)
 
 let user = new Schema(
     {
@@ -29,7 +29,7 @@ let user = new Schema(
             type: mongoose.Schema.Types.ObjectId,
             required: true,
             ref: 'Roles',
-            default: 0
+            default: 0 //todo: FIX THIS VALUE
         }
     }
 );
