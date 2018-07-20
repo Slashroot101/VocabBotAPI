@@ -6,7 +6,8 @@ const ErrorHandler = require(`../libs/errorHandler`);
 
 router.post(`/`, async(req, res) => {
     try {
-
+        let role = await Role.create(req.body.role);
+        ResponseHandler(res, `Succesfully created a role!`, role);
     } catch (err) {
         ErrorHandler.handleServerError(err, res, `Failed to create role!`);
     }

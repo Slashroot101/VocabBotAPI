@@ -1,7 +1,7 @@
 const mongoose = require(`mongoose`);
 const Schema = mongoose.Schema;
 
-let role = new Schema(
+let Role = new Schema(
     {
         name: {
             type: String,
@@ -21,4 +21,10 @@ let role = new Schema(
     }
 );
 
-module.exports = mongoose.model('Role', role);
+Role.statics.findByName = function findByName (name){
+    return new Promise((resolve, reject) => {
+        return this.model(`Role`).find({ name : name });
+    });
+};
+
+module.exports = mongoose.model('Role', Role);

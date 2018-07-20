@@ -28,8 +28,7 @@ let user = new Schema(
         role: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
-            ref: 'Roles',
-            default: 0 //todo: FIX THIS VALUE
+            ref: 'Roles'
         }
     }
 );
