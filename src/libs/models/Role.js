@@ -11,7 +11,7 @@ let Role = new Schema(
             }
         },
         permissions:{
-            type : [ { type : mongoose.Schema.Types.ObjectId, ref : `Permissions`}],
+            type : [ { type : mongoose.Schema.Types.ObjectId, ref : `Permission`}],
             required: true,
             default: [],
             index: {
@@ -21,10 +21,14 @@ let Role = new Schema(
     }
 );
 
+Role.statics.hasPermission = function hasPermission (roleID, name){
+    return this.model(`Role`)
+    .find({ _id : mongoose.Types.ObjectId(roleID)})
+    .populate({path :`permissions`, match : {name: name}}).exec();
+};
+
 Role.statics.findByName = function findByName (name){
-    return new Promise((resolve, reject) => {
-        return this.model(`Role`).find({ name : name });
-    });
+    return this.model(`Role`).find({ name : name });
 };
 
 module.exports = mongoose.model('Role', Role);

@@ -1,7 +1,7 @@
 const mongoose = require(`mongoose`);
 const Schema = mongoose.Schema;
 
-let permission = new Schema(
+let Permission = new Schema(
     {
         name: {
             type: String,
@@ -13,4 +13,6 @@ let permission = new Schema(
     }
 );
 
-module.exports = mongoose.model('Permission', permission);
+
+
+module.exports = mongoose.model('Permission', Permission);
