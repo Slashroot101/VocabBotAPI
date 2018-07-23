@@ -21,7 +21,7 @@ let Role = new Schema(
     }
 );
 
-Role.statics.hasPermission = function hasPermission (roleID, name){
+Role.statics.getPermission = function getPermission (roleID, name){
     return this.model(`Role`)
     .find({ _id : mongoose.Types.ObjectId(roleID)})
     .populate({path :`permissions`, match : {name: name}}).exec();
