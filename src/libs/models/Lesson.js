@@ -33,7 +33,7 @@ let Lesson = new Schema({
     },
     totalQuestionsAnswered: {
       type: Number,
-      required: True,
+      required: true,
       index: {
         unique: false
       }
