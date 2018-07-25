@@ -15,14 +15,16 @@ let Lesson = new Schema({
     required: true,
     index: {
       unique: false
-    }
+    },
+    default: 0
   },
   totalQuestionsAnsweredCorrectly: {
     type: Number,
     required: true,
     index: {
       unique: false
-    }
+    },
+    default: 0
   },
   users: [{
     id: {
