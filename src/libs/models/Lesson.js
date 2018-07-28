@@ -29,7 +29,10 @@ let Lesson = new Schema({
   users: [{
     id: {
       type:  mongoose.Schema.Types.ObjectId,
-      ref: `User`
+      ref: `User`,
+      index: {
+        unique: true
+      }
     },
     totalQuestionsAnswered: {
       type: Number,
@@ -64,7 +67,13 @@ Lesson.statics.findBySiteID = function findBySiteID (SiteID){
   .populate({path :`users`}).exec();
 };
 
-Lesson.statics.addUser = function addUserBySiteID(SiteID, user){
+Lesson.statics.doesUserExist = function doesUserExist (siteID, userID){
+  return this.model(`Lesson`)
+  .findOne({'users' : { $elemMatch : {id : userID}}, siteLessonID: siteID})
+  .exec();
+};
+
+Lesson.statics.addUser = function addUserBySiteID(siteID, user){
   return this.model(`Lesson`).update(
     { siteLessonID : siteID},
     { $push : { users : user}}

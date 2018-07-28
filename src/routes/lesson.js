@@ -13,6 +13,22 @@ router.post(`/`, async(req, res) => {
     }
 });
 
+router.post(`/site-id/:site_id/user/:user_id`, async(req, res) => {
+    try {
+        let lesson = await Lesson.doesUserExist(req.params.site_id, req.params.user_id);
+
+        if(lesson){
+            return ResponseHandler(res, `User already exists.`, lesson);
+        }
+
+        await Lesson.addUser(req.params.site_id, req.params.user_id);
+        ResponseHandler(res, `Succesfully added user`, {});
+    } catch (err){
+        console.log(err)
+        ErrorHandler.handleServerError(err, res, `Failed to add new user`);
+    }
+});
+
 router.get(`/site-id/:id`, async(req, res) => {
     try {
         let lesson = await Lesson.findBySiteID(req.params.id);
