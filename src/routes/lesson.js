@@ -13,6 +13,13 @@ router.post(`/`, async(req, res) => {
     }
 });
 
-
+router.get(`/site-id/:id`, async(req, res) => {
+    try {
+        let lesson = await Lesson.findBySiteID(req.params.id);
+        ResponseHandler(res, `Sucessfully got lesson by site ID`, lesson);
+    } catch (err){
+        ErrorHandler.handleServerError(err, res, `Failed to get lesson by site ID`);
+    }
+});
 
 module.exports = router;

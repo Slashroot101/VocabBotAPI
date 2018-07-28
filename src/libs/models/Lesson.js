@@ -36,14 +36,16 @@ let Lesson = new Schema({
       required: true,
       index: {
         unique: false
-      }
+      },
+      default: 0
     },
     totalQuestionsAnsweredCorrectly: {
       type: Number,
       required: true,
       index: {
         unique: false
-      }
+      },
+      default: 0
     },
     startDate: {
       type: Date,
@@ -55,6 +57,19 @@ let Lesson = new Schema({
     }
   }]
 });
+
+Lesson.statics.findBySiteID = function findBySiteID (SiteID){
+  return this.model(`Lesson`)
+  .find({ siteLessonID : SiteID })
+  .populate({path :`users`}).exec();
+};
+
+Lesson.statics.addUser = function addUserBySiteID(SiteID, user){
+  return this.model(`Lesson`).update(
+    { siteLessonID : siteID},
+    { $push : { users : user}}
+  ).exec();
+};
 
 module.exports = mongoose.model('Lesson', Lesson);
 
