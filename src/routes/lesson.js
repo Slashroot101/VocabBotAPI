@@ -24,7 +24,6 @@ router.post(`/site-id/:site_id/user/:user_id`, async(req, res) => {
         await Lesson.addUser(req.params.site_id, req.params.user_id);
         ResponseHandler(res, `Succesfully added user`, {});
     } catch (err){
-        console.log(err)
         ErrorHandler.handleServerError(err, res, `Failed to add new user`);
     }
 });
