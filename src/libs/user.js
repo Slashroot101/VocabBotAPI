@@ -19,7 +19,7 @@ exports.login = async(username, password) => {
         let Username = await User.findByUsername(username);
 
         if(!Username){
-            resolve({});
+            resolve();
         }
 
         let Password = await Username.comparePassword(password);
@@ -27,7 +27,7 @@ exports.login = async(username, password) => {
         if(Password){
             resolve(Username);
         } else {
-            resolve({});
+            resolve();
         }
     });
 };
