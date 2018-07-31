@@ -53,13 +53,22 @@ user.pre('save', function (next) {
     }
 });
 
-user.methods.comparePassword = function (passw, cb) {
-    bcrypt.compare(passw, this.password, function (err, isMatch) {
-        if (err) {
-            return cb(err);
-        }
-        cb(null, isMatch);
+user.methods.comparePassword = function (passw) {
+    return new Promise((resolve, reject) => {
+        bcrypt.compare(passw, this.password, function (err, isMatch) {
+            if (err) {
+                return reject(err);
+            }
+            resolve(isMatch);
+        });
     });
+
+};
+
+user.statics.findByUsername = function findByUsername(username){
+    return this.model(`User`)
+    .findOne({ username: username})
+    .exec();
 };
 
 module.exports = mongoose.model('User', user);
