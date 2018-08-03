@@ -22,6 +22,7 @@ let Role = new Schema(
     }
 );
 
+
 Role.statics.getPermission = function getPermission (roleID, name){
     return this.model(`Role`)
     .find({ _id : mongoose.Types.ObjectId(roleID)})
