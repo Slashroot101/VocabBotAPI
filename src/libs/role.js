@@ -18,5 +18,13 @@ exports.getDefaultRole = async() => {
 
         resolve(defaultRole);
     });
-}
+};
+
+exports.addPermission = async(roleID, permissionIDs) => {
+    return new Promise(async(resolve, reject) => {
+        await Role.addPermission(roleID, permissionIDs);
+
+        resolve();
+    });
+};
 

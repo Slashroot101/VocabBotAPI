@@ -15,13 +15,18 @@ let Role = new Schema(
             type : [ { type : mongoose.Schema.Types.ObjectId, ref : `Permission`}],
             required: true,
             default: [],
-            index: {
-                unique: false
-            }
+            unique: true
         }
     }
 );
 
+
+Role.statics.addPermission = function addPermissions (roleID, permissionIDs){
+    return this.model(`Role`).update(
+        { _id : roleID},
+        { $push : { permissions : permissionIDs}}
+      ).exec();
+};
 
 Role.statics.getPermission = function getPermission (roleID, name){
     return this.model(`Role`)

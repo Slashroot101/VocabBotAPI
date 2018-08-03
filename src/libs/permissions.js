@@ -10,3 +10,11 @@ exports.create = async(name) => {
         resolve(savedPerm);
     });
 };
+
+exports.findByID = async(id) => {
+    return new Promise(async(resolve, reject) => {
+        let permission = await Permission.findByID(id);
+
+        resolve(permission);
+    });
+};

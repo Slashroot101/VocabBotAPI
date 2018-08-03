@@ -13,6 +13,10 @@ let Permission = new Schema(
     }
 );
 
-
+Permission.statics.findByID = function findByID(id){
+    return this.model(`Permission`)
+    .findOne({ _id : id})
+    .exec();
+};
 
 module.exports = mongoose.model('Permission', Permission);
