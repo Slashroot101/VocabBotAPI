@@ -12,3 +12,11 @@ exports.create = (role) => {
     });
 };
 
+exports.getDefaultRole = async() => {
+    return new Promise(async(resolve, reject) => {
+        let defaultRole = await Role.getDefaultRole();
+
+        resolve(defaultRole);
+    });
+}
+

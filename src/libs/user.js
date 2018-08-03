@@ -5,11 +5,11 @@ exports.create = async (user) => {
         let newUser = new User({
             username: user.username,
             password: user.password,
-            email: user.email
+            email: user.email,
+            role: user.role
         });
 
         let savedUser = await newUser.save();
-        console.log(savedUser)
         resolve(savedUser);
     });
 };

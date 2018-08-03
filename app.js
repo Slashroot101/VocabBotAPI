@@ -14,7 +14,12 @@ var app = express();
 
 let config = require(`./config`);
 let mongoose = require(`mongoose`);
-mongoose.connect(config.db);
+
+mongoose.connect(config.db.url, {
+  user: config.db.username,
+  pass: config.db.password,
+  dbName: config.db.dbName
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

@@ -24,7 +24,6 @@ router.post(`/login`, async(req,res) => {
       ResponseHandler(res, `Username or password was incorrect.`, {});
     }
   } catch (err){
-    console.log(err);
     ErrorHandler.handleServerError(err, res, `Failed to login`);
   }
 });
