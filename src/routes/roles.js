@@ -5,6 +5,9 @@ const Permission = require(`../libs/permissions`);
 const ResponseHandler = require(`../libs/responseHandler`);
 const ErrorHandler = require(`../libs/errorHandler`);
 const ObjectId = require(`mongoose`).Types.ObjectId;
+const middlewares = require(`../libs/middlewares`);
+
+router.use(middlewares.checkToken);
 
 router.post(`/`, async(req, res) => {
     try {

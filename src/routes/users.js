@@ -4,6 +4,9 @@ const User = require(`../libs/user`);
 const Role = require(`../libs/role`);
 const ResponseHandler = require(`../libs/responseHandler`);
 const ErrorHandler = require(`../libs/errorHandler`);
+const middlewares = require(`../libs/middlewares`);
+
+router.use(middlewares.checkToken);
 
 router.post(`/`, async(req, res) => {
   try {
