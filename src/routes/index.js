@@ -14,7 +14,8 @@ router.post(`/login`, async(req,res) => {
       let returnedUser = {
         id: user._id,
         username: user.username,
-        email: user.email
+        email: user.email,
+        role: user.role
       };
       let token = jwt.sign(returnedUser, String(config.secret), {
         expiresIn: 1440

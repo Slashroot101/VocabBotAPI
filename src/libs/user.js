@@ -17,7 +17,6 @@ exports.create = async (user) => {
 exports.login = async(username, password) => {
     return new Promise(async(resolve) => {
         let Username = await User.findByUsername(username);
-
         if(!Username){
             resolve();
         }

@@ -10,7 +10,6 @@ exports.checkToken = (req, res, next) => {
             if (err) {
                 ErrorHandler.handleServerError(err, res, `Failed to verify token`);
             } else {
-                console.log(decoded)
                 req.decoded = decoded;
                 next();
             }

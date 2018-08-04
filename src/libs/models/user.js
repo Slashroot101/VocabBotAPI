@@ -28,7 +28,7 @@ let user = new Schema(
         role: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
-            ref: 'Roles'
+            ref: 'Role'
         }
     }
 );
@@ -68,6 +68,7 @@ user.methods.comparePassword = function (passw) {
 user.statics.findByUsername = function findByUsername(username){
     return this.model(`User`)
     .findOne({ username: username})
+    .populate({path: `role`, populate: {path: `permissions`}})
     .exec();
 };
 
