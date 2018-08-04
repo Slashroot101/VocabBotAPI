@@ -5,11 +5,15 @@ const Permission = require(`../libs/permissions`);
 const ResponseHandler = require(`../libs/responseHandler`);
 const ErrorHandler = require(`../libs/errorHandler`);
 const ObjectId = require(`mongoose`).Types.ObjectId;
-const {checkToken} = require(`../libs/middlewares`);
+const {checkToken, hasPermission} = require(`../libs/middlewares`);
+const permList = require(`../../permissions`);
+
 
 router.use(checkToken);
 
-router.post(`/`, async(req, res) => {
+router.post(`/`,
+ hasPermission(permList.permission.WRITE),
+ async(req, res) => {
     try {
         let role = await Role.create(req.body.role);
         ResponseHandler(res, `Succesfully created a role!`, role);
@@ -18,7 +22,9 @@ router.post(`/`, async(req, res) => {
     }
 });
 
-router.put(`/:role_id/permissions`, async(req, res) => {
+router.put(`/:role_id/permissions`,
+ hasPermission(permList.permission.EDIT),
+ async(req, res) => {
     try {
         let badPermIds = [];
         let goodPermIds = [];

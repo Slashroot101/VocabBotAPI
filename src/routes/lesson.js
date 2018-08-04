@@ -3,11 +3,14 @@ var router = express.Router();
 const Lesson = require(`../libs/lesson`);
 const ResponseHandler = require(`../libs/responseHandler`);
 const ErrorHandler = require(`../libs/errorHandler`);
-const {checkToken} = require(`../libs/middlewares`);
+const {checkToken, hasPermission} = require(`../libs/middlewares`);
+const permList = require(`../../permissions`);
 
 router.use(checkToken);
 
-router.post(`/`, async(req, res) => {
+router.post(`/`,
+ hasPermission(permList.lesson.WRITE),
+ async(req, res) => {
     try{
         let newLesson = await Lesson.create(req.body.lesson);
         ResponseHandler(res, `Succesfully created a lesson`, newLesson);
@@ -16,7 +19,9 @@ router.post(`/`, async(req, res) => {
     }
 });
 
-router.post(`/site-id/:site_id/user/:user_id`, async(req, res) => {
+router.put(`/site-id/:site_id/user/:user_id`,
+ hasPermission(permList.lesson.EDIT),
+ async(req, res) => {
     try {
         let lesson = await Lesson.doesUserExist(req.params.site_id, req.params.user_id);
 
@@ -31,7 +36,9 @@ router.post(`/site-id/:site_id/user/:user_id`, async(req, res) => {
     }
 });
 
-router.get(`/site-id/:id`, async(req, res) => {
+router.get(`/site-id/:id`,
+ hasPermission(permList.lesson.READ),
+ async(req, res) => {
     try {
         let lesson = await Lesson.findBySiteID(req.params.id);
         ResponseHandler(res, `Sucessfully got lesson by site ID`, lesson);

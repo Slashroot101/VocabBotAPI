@@ -4,11 +4,14 @@ const User = require(`../libs/user`);
 const Role = require(`../libs/role`);
 const ResponseHandler = require(`../libs/responseHandler`);
 const ErrorHandler = require(`../libs/errorHandler`);
-const {checkToken} = require(`../libs/middlewares`);
+const {checkToken, hasPermission} = require(`../libs/middlewares`);
+const permList = require(`../../permissions`);
 
 router.use(checkToken);
 
-router.post(`/`, async(req, res) => {
+router.post(`/`,
+ hasPermission(permList.user.WRITE),
+ async(req, res) => {
   try {
     let defaultRole = await Role.getDefaultRole();
     req.body.user.role = defaultRole._id;

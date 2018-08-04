@@ -8,9 +8,10 @@ const permList = require(`../../permissions`);
 
 router.use(checkToken);
 
-router.post(`/`, hasPermission(permList.permission.WRITE), async(req, res) => {
+router.post(`/`,
+ hasPermission(permList.permission.WRITE),
+ async(req, res) => {
     try {
-        console.log(req.decoded)
         let newPerm = await Permissions.create(req.body.permission);
         ResponseHandler(res, `Succesfully created the permission!`, newPerm);
     } catch (err) {
