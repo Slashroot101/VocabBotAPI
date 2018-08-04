@@ -1,2 +1,1 @@
 update user role
-add middleware to rest of routes

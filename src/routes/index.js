@@ -17,6 +17,7 @@ router.post(`/login`, async(req,res) => {
         email: user.email,
         role: user.role
       };
+      console.log(user.role.permissions)
       let token = jwt.sign(returnedUser, String(config.secret), {
         expiresIn: 1440
       });
