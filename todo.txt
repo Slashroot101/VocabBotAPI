@@ -1,3 +1,2 @@
-add permission to role route (make sure permission exists)
 update user role
-does permission exist  to add permission to role route
+add middleware to rest of routes

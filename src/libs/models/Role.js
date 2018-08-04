@@ -21,6 +21,11 @@ let Role = new Schema(
 );
 
 
+Role.statics.hasPermission = function hasPermission(roleId, permissionID){
+    return this.model(`Role`)
+    .find({ _id : roleId, permissions: { $in : permissionID}})
+};
+
 Role.statics.addPermission = function addPermissions (roleID, permissionIDs){
     return this.model(`Role`).update(
         { _id : roleID},
@@ -28,7 +33,7 @@ Role.statics.addPermission = function addPermissions (roleID, permissionIDs){
       ).exec();
 };
 
-Role.statics.getPermission = function getPermission (roleID, name){
+Role.statics.getPermissionByName = function getPermissionByName (roleID, name){
     return this.model(`Role`)
     .find({ _id : mongoose.Types.ObjectId(roleID)})
     .populate({path :`permissions`, match : {name: name}}).exec();

@@ -12,6 +12,7 @@ router.post(`/login`, async(req,res) => {
 
     if(user){
       let returnedUser = {
+        id: user._id,
         username: user.username,
         email: user.email
       };

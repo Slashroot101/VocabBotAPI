@@ -5,6 +5,7 @@ const Permission = require(`../libs/permissions`);
 const ResponseHandler = require(`../libs/responseHandler`);
 const ErrorHandler = require(`../libs/errorHandler`);
 const ObjectId = require(`mongoose`).Types.ObjectId;
+
 router.post(`/`, async(req, res) => {
     try {
         let role = await Role.create(req.body.role);
@@ -24,8 +25,12 @@ router.put(`/:role_id/permissions`, async(req, res) => {
                 if(!perm){
                     badPermIds.push(req.body.permissions[i]);
                 } else {
-                    
-                    goodPermIds.push(req.body.permissions[i]);
+                    let rolePerm = await Role.hasPermission(req.params.role_id, req.body.permissions[i]);
+                    if(rolePerm.length === 1){
+                        badPermIds.push(req.body.permissions[i]);
+                    } else {
+                        goodPermIds.push(req.body.permissions[i]);
+                    }
                 }
             } else {
                 badPermIds.push(req.body.permissions[i]);
@@ -35,7 +40,6 @@ router.put(`/:role_id/permissions`, async(req, res) => {
 
         ResponseHandler(res, `Succesfully added permission(s)`, {badPermIds});
     } catch (err){
-        console.log(err)
         ErrorHandler.handleServerError(err, res, `Failed to add permission(s) to role`);
     }
 });

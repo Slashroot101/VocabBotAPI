@@ -1,8 +1,12 @@
 var express = require('express');
 var router = express.Router();
 const Lesson = require(`../libs/lesson`);
+const middlewares = require(`../libs/middlewares`);
 const ResponseHandler = require(`../libs/responseHandler`);
 const ErrorHandler = require(`../libs/errorHandler`);
+
+//route middlware to verify token
+router.use(middlewares.checkToken);
 
 router.post(`/`, async(req, res) => {
     try{
