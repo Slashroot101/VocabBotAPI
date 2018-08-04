@@ -3,9 +3,9 @@ var router = express.Router();
 const Lesson = require(`../libs/lesson`);
 const ResponseHandler = require(`../libs/responseHandler`);
 const ErrorHandler = require(`../libs/errorHandler`);
-const middlewares = require(`../libs/middlewares`);
+const {checkToken} = require(`../libs/middlewares`);
 
-router.use(middlewares.checkToken);
+router.use(checkToken);
 
 router.post(`/`, async(req, res) => {
     try{
