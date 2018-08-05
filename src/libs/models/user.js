@@ -62,6 +62,13 @@ user.methods.comparePassword = function (passw) {
             resolve(isMatch);
         });
     });
+};
+
+user.statics.updateRole = function updateRole(userID, roleID){
+    return this.model(`User`).update(
+        { _id : userID},
+        { $set : {role : roleID}}
+    )
 
 };
 
