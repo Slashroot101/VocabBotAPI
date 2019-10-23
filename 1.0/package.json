@@ -16,7 +16,7 @@
     "jsonwebtoken": "^7.4.1",
     "moment": "^2.18.1",
     "mongo-watch": "^0.2.8",
-    "mongoose": "^4.10.8",
+    "mongoose": "^5.7.5",
     "morgan": "~1.8.1",
     "nodemon": "^1.11.0",
     "promise": "^8.0.1",
